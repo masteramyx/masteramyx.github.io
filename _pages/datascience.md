@@ -1,10 +1,9 @@
 ---
-layout: archive
-permalink: /datascience/
-title: "Data Science"
-author_profile: true
-header:
-  image: "/images/ioPhoto.jpg"
+  permalink: /datascience/
+  title: "Data Science"
+  author_profile: true
+  header:
+    image: "/images/ioPhoto.jpg"
 ---
 
 <!-- {% include base_path %}
