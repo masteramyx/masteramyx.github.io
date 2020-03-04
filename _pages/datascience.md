@@ -1,13 +1,13 @@
 ---
 layout: archive
-permalink: /data-science/
+permalink: /datascience/
 title: "Data Science"
 author_profile: true
 header:
   image: "/images/ioPhoto.jpg"
 ---
 
-{% include base_path %}
+<!-- {% include base_path %}
 {% include group-by-array collection=site.posts field="tags" %}
 
 {% for tag in group_names %}
@@ -16,4 +16,4 @@ header:
   {% for post in posts %}
     {% include archive-single.html %}
   {% endfor %}
-{% endfor %}
+{% endfor %} -->
