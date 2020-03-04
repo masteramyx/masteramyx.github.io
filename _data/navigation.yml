@@ -5,7 +5,7 @@ main:
   - title: "About"
     url: /about/
   - title: "Data science"
-    url: /data-science/
+    url: /datascience/
   # - title: "About"
   #   url: https://mmistakes.github.io/minimal-mistakes/about/
   # - title: "Sample Posts"
