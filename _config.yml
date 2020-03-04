@@ -111,7 +111,7 @@ analytics:
 # Site Author
 author:
   name             : "Kyle Amyx"
-  avatar           : "/images/bio_image.jpg"
+  avatar           : "/assets/images/bio_image.jpg"
   bio              : "I am an **amazing** person."
   location         : "Columbus, OH"
   email            :
