@@ -3,7 +3,7 @@
   date: 2020-03-09
   tags: [EDA, regression]
   header:
-    image: "../assets/images/tractor/TractorVsEduPlots/nonLinear.png"
+    image: "../assets/images/tractor/tractorHeaderImg.jpg"
   excerpt: "Data Science"
 ---
 
