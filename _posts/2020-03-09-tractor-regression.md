@@ -32,7 +32,7 @@ VAM is a metric that describes the how economy of a region, in this case a count
 This data was sparse but in order to gain best high-level understanind as possible, I created a map with gradient to visualize counties with highest and lowest VAM across our selected time period.
 
 
-![alt]({{ site.url }}{{ site.baseurl }}/assets/images/tractor/vam(1929-2007)/1929.pdf) ![alt]({{ site.url }}{{ site.baseurl }}/assets/images/tractor/vam(1929-2007)/RUCC_adjusted/1929.pdf)
+<img src="{{ site.url }}{{ site.baseurl }}/assets/images/tractor/vam(1929-2007)/1929.pdf" alt="1929"> <img src="{{ site.url }}{{ site.baseurl }}/assets/images/tractor/vam(1929-2007)/RUCC_adjusted/1929.pdf" alt="1929RUCC">
 
 
 Using census manufacturing data
