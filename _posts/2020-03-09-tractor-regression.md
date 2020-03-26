@@ -9,21 +9,31 @@
 
 ## Overview
 
-This research was a part of a greater project headed by Dr. William White and Dr. Richard Steckel of The Ohio State University's Department of Economics. The core focus of the project was to look at the ways education was affected by tractorization and rural manufacturing.
+This research was a part of a greater project headed by Dr. William White and Dr. Richard Steckel of The Ohio State University's Department of Economics. The core focus of the project was to look at the ways education was affected by early tractorization and rural manufacturing.
 
 ## The Data
-
-Multiple data sets were used in this analysis. For starters, USA agricultural and manufacturing census data from 1918-2007. Ohio education data at the county level, along with serveral other raw and compiled sets.
+Much of the data came from Michale Haine's [ICPSR Study Number 2896](https://www.colgate.edu/about/directory/mhaines). However quite a bit of cleaning and formatting was required to create sets which allowed for our analysis.
 
 ## The Focus
 
 This was broken down into several parts, atttempting to answer several different questions.
 
+Each of these questions focused around rural counties based on RUCC codes. Highly urban areas were not of interest as they naturally would not contain much farming and thus tractorization would be minimal to non existent, manufacturing was already present in these areas and in general education was high relative to the rural communities.
 
-## Preparing the data
+1. Did early adoption of tractors lead to more manufacturing in these communities?
+   1A. Did the injection of manufacturing in these rural communities have an effect on education?
+
+2. Was there an increase in average education level in the counties which had early adoption of tractors.
 
 
 ## Value Added By Manufacturing
+
+VAM is a metric that describes the how economy of a region, in this case a county, benefitted from the manufacturing industry within that space.
+This data was sparse but in order to gain best high-level understanind as possible, I created a map with gradient to visualize counties with highest and lowest VAM across our selected time period.
+
+
+![alt]({{ site.url }}{{ site.baseurl }}/assets/images/tractor/vam(1929-2007)/1929.pdf) ![alt]({{ site.url }}{{ site.baseurl }}/assets/images/tractor/vam(1929-2007)/RUCC_adjusted/1929.pdf)
+
 
 Using census manufacturing data
 
