@@ -34,7 +34,14 @@ This data was sparse but in order to gain best high-level understanind as possib
 
 1929 ALL             |  1929 Rural
 :-------------------------:|:-------------------------:
-<embed src="{{ site.url }}{{ site.baseurl }}/assets/images/tractor/vam(1929-2007)/1929.pdf" type="application/pdf">  |  <embed src="{{ site.url }}{{ site.baseurl }}/assets/images/tractor/vam(1929-2007)/RUCC_adjusted/1929.pdf" type="application/pdf"> 
+<embed src="{{ site.url }}{{ site.baseurl }}/assets/images/tractor/vam(1929-2007)/1929.pdf" type="application/pdf">  |  <embed src="{{ site.url }}{{ site.baseurl }}/assets/images/tractor/vam(1929-2007)/RUCC_adjusted/1929.pdf" type="application/pdf">
+
+
+<figure class="half">
+    <a href="/assets/images/tractor/vam(1929-2007)/1929.pdf"><img src="/assets/images/tractor/vam(1929-2007)/1929.png"></a>
+    <a href="/assets/images/tractor/vam(1929-2007)/RUCC_adjusted/1929.pdf"><img src="/assets/images/tractor/vam(1929-2007)/RUCC_adjusted/1929.png"></a>
+    <figcaption>Caption describing these two images.</figcaption>
+</figure>
 
 
 
