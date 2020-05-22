@@ -6,6 +6,8 @@ main:
     url: /about/
   - title: "Data science"
     url: /datascience/
+  - title: "Android"
+    url: /android/
   # - title: "About"
   #   url: https://mmistakes.github.io/minimal-mistakes/about/
   # - title: "Sample Posts"

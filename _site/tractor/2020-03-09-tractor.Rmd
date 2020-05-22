@@ -1,0 +1,1548 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.18.1 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Tractor - Kyle Amyx</title>
+<meta name="description" content="Data Science Portfolio ">
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Kyle Amyx">
+<meta property="og:title" content="Tractor">
+<meta property="og:url" content="http://localhost:4000/tractor/2020-03-09-tractor.Rmd">
+
+
+  <meta property="og:description" content="Data Science Portfolio ">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2020-11-05T00:00:00-05:00">
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="http://localhost:4000/tractor/2020-03-09-tractor.Rmd">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Kyle Amyx",
+      "url": "http://localhost:4000/"
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Kyle Amyx Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="/assets/images/osu_logo_small.png" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Kyle Amyx
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/about/" >About</a>
+            </li><li class="masthead__menu-item">
+              <a href="/datascience/" >Data science</a>
+            </li><li class="masthead__menu-item">
+              <a href="/android/" >Android</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name"></h3>
+    
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Tractor">
+    
+    <meta itemprop="datePublished" content="2020-11-05T00:00:00-05:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Tractor
+</h1>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+library(readstata13)
+library(dplyr)
+library(ggplot2)
+library(InformationValue)
+library(tidyverse)
+
+"Difference between echo and include?
+  echo = FALSE hides the code, but will evaluate it and show its output in the knit. 
+include = FALSE hides the code AND the output from the knit, but will evaluate the code silently."
+```
+
+* Tractor/VAM Plots & Models:
+<br>
+  [Ohio](#ohio-tractor-vam-plots)
+  <br>
+  [Michigan](#michigan-tractor-vam-plots)
+  <br>
+  [Wisconsin](#wisconsin-tractor-vam-plots)
+  <br>
+  [Indiana](#indiana-tractor-vam-plots)
+  <br>
+  [Illinois](#illinois-tractor-vam-plots)
+  <br>
+  [Iowa](#iowa-tractor-vam-plots)
+
+
+* [VAM Regression](#vam-regression)
+
+Note about VAM Plots: Any counties with `N/A` value for VAM were replaced with 0. These are so few that I believe it has minimal effect on the trend lines. 
+
+```{r dataWranglingFunctions, echo=TRUE}
+#Function for producing EDU dataset
+#
+#
+eduDataFunc <- function(state){
+  edu_data <- subset(oth_state, stateicp == state)
+  edu_data <- subset(edu_data, sex == "Male")
+  edu_data <- subset(edu_data, between(age, 18,22))
+  edu_data <- subset(edu_data, higrade < 20)
+  edu_data <- subset(edu_data, higrade > 0)
+  edu_data$higrade <- edu_data$higrade - 3
+  
+  reduced_edu_data <- edu_data %>%
+    group_by(county) %>%
+    summarise(avg = mean(higrade))
+  
+  return(reduced_edu_data)
+}
+#
+#
+#
+
+eduMedianFunc <- function(state){
+  edu_data <- subset(oth_state, stateicp == state)
+  edu_data <- subset(edu_data, sex == "Male")
+  edu_data <- subset(edu_data, between(age, 18,22))
+  edu_data <- subset(edu_data, higrade < 20)
+  edu_data <- subset(edu_data, higrade > 0)
+  edu_data$higrade <- edu_data$higrade - 3
+  
+  reduced_edu_data <- edu_data %>%
+    group_by(county) %>%
+    summarise(med = median(higrade))
+  
+  return(reduced_edu_data)
+}
+
+
+#Function for producing Tractor set given State Abb
+#
+#
+tractDataFunc <- function(stateAbbre){
+  stateDf <- subset(df30, stateAbb == stateAbbre)
+  stateDf$county <- stateDf$county * 10
+  stateDf$X <- NULL
+  return(stateDf)
+}
+#
+#
+#
+
+
+```
+
+
+```{r mainData, echo = FALSE}
+df <- read.csv("Tractor_Raw_Data/df29-69.csv")
+filtered <- read.csv("Tractor_Raw_Data/filtered_df.csv")
+stateLvl <- read.csv("Tractor_Raw_Data/rolledUp_all.csv")
+vam <- read.csv("vamFipsData.csv")
+vam_1958 <- subset(vam, year == 1958)
+vam_1963 <- subset(vam, year == 1963)
+df25 <- subset(df, year == 1925)
+df30<- subset(df, year == 1930)
+df40<- subset(df, year == 1940)
+df50<- subset(df, year == 1950)
+df54<- subset(df, year == 1954)
+df64<- subset(df, year == 1964)
+df69<- subset(df, year == 1969)
+```
+
+---
+
+#National Level
+
+Looking at the national level of percent of farms with tractors over varying years. The percentages are measured on the county level. 
+
+## % Farm Tractor 1940 vs 1930
+```{r nationalTractor1940v1930}
+df30_40 <- merge(df30, df40, by = c("name", "stateAbb"), all = FALSE)
+ggplot(data = df30_40, aes(x=percent_farm_tractor.x, y=percent_farm_tractor.y)) + geom_point() + xlab(label = "% of Farms w/ Tractors 1930's") + ylab(label = "% of Farms w/ Tractors 1940's") + ggtitle(label = "National Level")
+
+```
+
+## % Farm Tractor 1950 vs 1940
+```{r nationalTractor1950v1940}
+df40_50 <- merge(df40, df50, by = c("name", "stateAbb"), all = FALSE)
+ggplot(data = df40_50, aes(x=percent_farm_tractor.x, y=percent_farm_tractor.y)) + geom_point() + xlab(label = "% of Farms w/ Tractors 1940's") + ylab(label = "% of Farms w/ Tractors 1950's") + ggtitle(label = "National Level")
+```
+
+
+## % Farm Tractor 1954 vs 1950
+```{r nationalTractor1954v1950}
+df50_54 <- merge(df50, df54, by = c("name", "stateAbb"), all = FALSE)
+ggplot(data = df50_54, aes(x=percent_farm_tractor.x, y=percent_farm_tractor.y)) + geom_point() + xlab(label = "% of Farms w/ Tractors 1950") + ylab(label = "% of Farms w/ Tractors 1954") + ggtitle(label = "National Level")
+
+df50_54$logResponse <- log(df50_54$percent_farm_tractor.y)
+df50_54$logX <- log(df50_54$percent_farm_tractor.x)
+ggplot(data = df50_54, aes(x=percent_farm_tractor.x, y=logResponse)) + geom_point() + xlab(label = "% of Farms w/ Tractors 1950") + ylab(label = "Log(% of Farms w/ Tractors 1954)") + ggtitle(label = "National Level") 
+ggplot(data = df50_54, aes(x=logX, y=logResponse)) + geom_point() + xlab(label = "Log(% of Farms w/ Tractors 1950)") + ylab(label = "Log(% of Farms w/ Tractors 1954)") + ggtitle(label = "National Level")
+```
+
+
+
+## % Farm Tractor 1964 vs 1954
+```{r nationalTractor1964v1954}
+df54_64 <- merge(df54, df64, by = c("name", "stateAbb"), all = FALSE)
+ggplot(data = df54_64, aes(x=percent_farm_tractor.x, y=percent_farm_tractor.y)) + geom_point() + xlab(label = "% of Farms w/ Tractors 1954") + ylab(label = "% of Farms w/ Tractors 1964") + ggtitle(label = "National Level")
+```
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+# OHIO<a id="ohio-tractor-vam-plots"></a>
+
+[Mean Edu vs. Tractor](#ohio-mean-edu-model)  
+<br>
+[Median Edu vs. Tractor](#ohio-median-edu-model)  
+<br>
+[Value Added by Manufacturing](#ohio-vam)  
+<br>
+
+```{r Ohio1940AvgEduv1930Tractor}
+
+edu <- read.dta13("ohio1940.dta")
+
+ohio1930 <- subset(df30, stateAbb == "OH")
+#Adjust FIPS code representation to match the EDU dataset
+ohio1930$county <- ohio1930$county * 10
+#Remove Pickaway
+ohio1930 <- subset(ohio1930, county != 129)
+
+#SUBSET to White males between 18,22 and higrade < 20 which would be graduate school
+edu <- subset(edu, sex == "Male")
+edu <- subset(edu, between(age, 18, 22))
+edu <- subset(edu, higrade < 20)
+edu$higrade <- edu$higrade - 3
+
+#Remove all values less than 1
+edu <- edu[which(edu$higrade > 0),]
+
+
+#THIS IS FINAL 1940 EDU, write out to new dataset 
+write.csv(edu, "ohio1940edu.csv")
+
+
+newEdu <- edu %>%
+  group_by(county) %>%
+  summarise(avg = mean(higrade))
+
+ohPlotSrc <- merge(newEdu, ohio1930, by = "county")
+
+ggplot(data = ohPlotSrc, aes(x=percent_farm_tractor, y=avg)) +xlab(label = "% Farms w/ Tractors 1930") + ylab(label = "Avg Years Education") + ggtitle(label = "Ohio") + geom_point()
+```
+
+
+## LOESS REGRESSION on 1940's Avg EDU vs % Farms w/ Tractor 1930's for Ohio
+```{r ohEduVsTractorLoess}
+ggplot(ohPlotSrc,aes(x = percent_farm_tractor, y = avg)) + geom_point()  + geom_smooth() + xlab("1930's % Farms w/ Tractors") + ylab("1940's Edu") + ggtitle("Ohio")
+#identify(ohio1930$percent_farm_tractor, newEdu$avg)
+```
+
+##Transform ohio edu response on Log Scale 
+### Ohio Mean Education Model<a id="ohio-mean-edu-model"></a>
+
+```{r ohLog1940EduMeanv1930Tractor}
+ohPlotSrc$logAvg <- log(ohPlotSrc$avg)
+
+ohEduMod <- lm(logAvg ~ percent_farm_tractor, data = ohPlotSrc)
+ggplot(data = ohPlotSrc, aes(x=percent_farm_tractor, y=logAvg)) + geom_point() + geom_smooth(method = "lm") + xlab(label = "% Farms Tractor 1930's") + ylab(label = "Log(Avg Education 1940's)") + ggtitle(label = "Log-Linear(Ohio Edu vs Tractor)") 
+summary(ohEduMod)
+```
+
+
+### Ohio - Median Education Plots<a id="ohio-median-edu-model"></a>
+```{r ohEduMedianv1930TractorPlots}
+eduMedian <- edu %>%
+  group_by(county) %>%
+  summarise(med = median(higrade))
+# Log of Education Median
+eduMedian$logMed <- log(eduMedian$med)
+
+ggplot(data = ohio1930, aes(x=jitter(percent_farm_tractor), y=jitter(eduMedian$med))) + geom_point() + xlab(label = "% Farms w/ Tractors 1930's") + ylab(label = "1940's Median Avg. Education")
+ggplot(data = ohio1930, aes(x=jitter(percent_farm_tractor), y=jitter(eduMedian$logMed))) + geom_point() + xlab(label = "% Farms w/ Tractors 1930's") + ylab(label = "1940's Median Avg. Education")
+```
+
+### Ohio - Median Education Model
+```{r ohEduMedianv1930TractorModel}
+ohPlotSrc_med <- merge(eduMedian, ohio1930, by = "county")
+ohEduMod_med <- lm(logMed ~ percent_farm_tractor, data = ohPlotSrc_med)
+summary(ohEduMod_med)
+
+oh_med_df <- as.data.frame(resid(ohEduMod_med))
+oh_med_df$county <- ohPlotSrc_med$name
+colnames(oh_med_df) <- c( "residual", "county")
+```
+
+### Ohio Median Model County Residuals
+```{r ohMedianEduvTractorModelResiduals}
+head(oh_med_df)
+```
+
+## OH EDU VS % Farm's w/ Tractors S.S.E.
+```{r ohEduvTractorSSE}
+#Calculate SSE
+pred_ohEdu <- predict(ohEduMod, ohPlotSrc)
+#Undo log transformation
+pred_ohEdu <- exp(pred_ohEdu)-1
+
+##Sum of Square error
+mean((ohPlotSrc$avg - pred_ohEdu)^2)
+
+
+#Residuals
+ohPlotSrc$modResid <- resid(ohEduMod)
+ohPlotSrc$fitted <- predict(ohEduMod)
+ggplot(ohPlotSrc, aes(x = fitted, y = modResid)) + geom_point() + geom_hline(yintercept = 0, colour = "red") + ggtitle(label = "OH Edu vs Tractor Residuals")
+```
+
+
+# OHIO Value Added by Manufacturing<a id="ohio-vam"></a>
+## VAM 1947 vs % 1940
+```{r ohVAM1947v1940}
+
+#SCATTER DIAGRAM AND REGRESSION FOR OHIO VAM VS EDU
+#VAM dataset
+vam_ohio <- subset(vam, state == "Ohio")
+#write.csv(vam_ohio, "vamOhio.csv")
+
+#VAM in 1947 vs % Tractors 1940
+vam_ohio <- subset(vam_ohio, year == 1947)
+ohio1940 <- subset(df40, stateAbb == "OH")
+ohio1930 <- subset(df30, stateAbb == "OH")
+ohio1940$county <- ohio1940$county * 10
+
+ggplot(data = ohio1940, aes(x=percent_farm_tractor, y=vam_ohio$VAM)) + geom_point() + xlab(label = "% Farm's w/ Tractors 1940") + ylab(label = "VAM 1947") + ggtitle(label = "Ohio VAM vs. % Tractor") + geom_smooth(method = "lm")
+```
+
+## VAM 1958 vs % 1950
+```{r ohVAM1958v1950}
+ohio1950 <- subset(df50,stateAbb == "OH" )
+vam_ohio1957 <- subset(vam, year == 1958 & state == "Ohio")
+ohVam_mod <- lm(vam_ohio1957$VAM ~ ohio1950$percent_farm_tractor)
+summary(ohVam_mod)
+ggplot(data = ohio1950, aes(x=percent_farm_tractor, y=vam_ohio1957$VAM)) + geom_point() + xlab(label = "% Farm's w/ Tractors 1950") + ylab(label = "VAM 1958") + ggtitle(label = "Ohio VAM vs. % Tractor") + geom_smooth(method = "lm")
+```
+
+## VAM 1947 vs % 1930
+```{r ohVAM1947v1930}
+ohVam_mod1947 <- lm(vam_ohio$VAM ~ ohio1930$percent_farm_tractor)
+summary(ohVam_mod1947)
+ggplot(data = ohio1930, aes(x=percent_farm_tractor, y=vam_ohio$VAM)) + geom_point() + xlab(label = "% Farm's w/ Tractors 1930") + ylab(label = "VAM 1947") + ggtitle(label = "Ohio VAM vs. % Tractor") + geom_smooth(method = "lm")
+```
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+1940 Census Dataset; Pull other midwest states from here
+```{r midwestStatesData}
+# NEW DATASET! -> EDU 1940 vs % Tractor 1930
+#oth_state <- read.dta13("cen1940A.dta")
+#saveRDS(oth_state, "midwest_state.rds")
+
+# Restore the data object. Shit is huge...I was tired of loading it over and over...
+oth_state = readRDS(file = "midwest_state.rds")
+
+#States:
+# Michigan, Wisconsin, Indiana, Illinois, Iowa, Minnesota
+```
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# MICHIGAN<a id="michigan-tractor-vam-plots"></a>
+```{r michiganEduData, echo=FALSE}
+"use `stateicp` as locations
+age between 18,22
+higrade < 20"
+
+
+#Michigan Edu
+mich_edu <- eduDataFunc("Michigan")
+
+#Michigan Tractor
+mich_tract <- tractDataFunc("MI")
+
+michPlotSrc <- merge(mich_edu, mich_tract, by = "county")
+```
+
+#LOESS REGRESSION on EDU vs % Tractor
+```{r michiganFarmvEduLoess}
+ggplot(michPlotSrc,aes(x = percent_farm_tractor, y = avg)) + geom_point()  + geom_smooth() + xlab("1930's % Tractor") + ylab("1940 Avg. Edu") + ggtitle("Michigan")
+```
+
+
+#Transform response on Log Scale
+```{r}
+michPlotSrc$logAvg <- log(michPlotSrc$avg)
+
+ggplot(data = michPlotSrc, aes(x=percent_farm_tractor, y=logAvg)) + geom_point() + ggtitle(label = "Log-Linear") 
+michEduMod <- lm(logAvg ~ percent_farm_tractor, data = michPlotSrc)
+summary(michEduMod)
+
+#Residuals
+michPlotSrc$modResid <- resid(michEduMod)
+michPlotSrc$fitted <- predict(michEduMod)
+ggplot(michPlotSrc, aes(x = fitted, y = modResid)) + geom_point() + geom_hline(yintercept = 0, colour = "red") + ggtitle(label = "MI Edu vs Tractor Residuals")
+```
+
+#Michigan - Median
+```{r}
+
+michMedian <- eduMedianFunc("Michigan")
+
+ggplot(data = mich_tract, aes(x=percent_farm_tractor, y=jitter(michMedian$med))) + geom_point() + ggtitle(label = "Michigan-Median")
+michMedian$logMed <- log(michMedian$med)
+
+ggplot(data = mich_tract, aes(x=jitter(percent_farm_tractor), y=jitter(michMedian$logMed))) + geom_point() + xlab("% 1930's") + ylab("Log Median years education") + ggtitle("Michigan-Log(Median)")
+```
+
+### Michigan - Median Model
+```{r}
+plotSrc_med_mich <- merge(michMedian, mich_tract, by = "county")
+michEduMod_med <- lm(logMed ~ percent_farm_tractor, data = plotSrc_med_mich)
+summary(michEduMod_med)
+
+mi_med_df <- as.data.frame(resid(michEduMod_med))
+mi_med_df$county <- plotSrc_med_mich$name
+colnames(mi_med_df) <- c( "residual", "county")
+
+```
+
+### Michigan Median Model County Residuals
+```{r}
+mi_med_df
+```
+
+
+
+
+#SCATTER DIAGRAM AND REGRESSION FOR MICHIGAN VAM VS EDU
+```{r}
+mich_vam <- subset(vam, state == "Michigan" & year == 1947)
+ggplot(data=mich_tract, aes(x=percent_farm_tractor, y=mich_vam$VAM)) + geom_point() + geom_smooth(method = "lm") + ggtitle("Michigan VAM 1947 vs % Tractor 1940")
+
+
+outlierMich <- michPlotSrc[44,]
+outlierMich
+```
+
+
+## MI EDU VS % SSE
+```{r}
+#Calculate SSE
+pred_michEdu <- predict(michEduMod, michPlotSrc)
+#Undo log transformation
+pred_michEdu <- exp(pred_michEdu)-1
+
+mean((michPlotSrc$avg - pred_michEdu)^2)
+```
+
+## VAM 1958 vs % 1950
+```{r}
+mich1930 <- subset(df30,stateAbb == "MI" )
+mich1950 <- subset(df50,stateAbb == "MI" )
+vam_mich1957 <- subset(vam, year == 1958 & state == "Michigan")
+michVam_mod <- lm(vam_mich1957$VAM ~ mich1950$percent_farm_tractor)
+summary(michVam_mod)
+
+ggplot(data=mich1950, aes(x=percent_farm_tractor, y=vam_mich1957$VAM)) + geom_point() + ggtitle("Michigan - 1957 VAM vs 1950 %")
+```
+
+## VAM 1947 vs % 1930
+```{r}
+vam_mich1947 <- subset(vam, year == 1947 & state == "Michigan")
+michVam_mod1947 <- lm(vam_mich1947$VAM ~ mich1930$percent_farm_tractor)
+summary(michVam_mod1947)
+
+ggplot(data=mich1930, aes(percent_farm_tractor, vam_mich1947$VAM)) + ggtitle("Michigan - 1947 VAM vs 1930 %")  + geom_point()
+```
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# WISCONSIN<a id="wisconsin-tractor-vam-plots"></a>
+
+```{r}
+
+#Wisconsin Edu
+wis_edu <- eduDataFunc("Wisconsin")
+
+#Wisconsin Tractor
+wis_tract <- tractDataFunc("WI")
+
+plot(wis_tract$percent_farm_tractor, wis_edu$avg, xlab = "1930 % Tractor", ylab = "1940 Avg. Edu", main = "Wisconsin")
+plot(log(wis_tract$percent_farm_tractor), wis_edu$avg)
+
+wisPlotSrc <- merge(wis_edu, wis_tract, by = "county")
+
+#LOESS REGRESSION on EDU vs % Tractor
+ggplot(wisPlotSrc,aes(x = percent_farm_tractor, y = avg)) + geom_point()  + geom_smooth() + xlab("1930's % Tractor") + ylab("1940 Avg. Edu") + ggtitle("Wisconsin")
+
+
+
+#Transform response on Log Scale
+wisPlotSrc$logAvg <- log(wisPlotSrc$avg)
+wisPlotSrc$logX <- log(wisPlotSrc$percent_farm_tractor)
+
+plot(wisPlotSrc$percent_farm_tractor, wisPlotSrc$logAvg, main = "Log-Linear")
+wisEduMod <- lm(logAvg ~ percent_farm_tractor, data = wisPlotSrc)
+summary(wisEduMod)
+
+#Residuals
+wisPlotSrc$modResid <- resid(wisEduMod)
+wisPlotSrc$fitted <- predict(wisEduMod)
+ggplot(wisPlotSrc, aes(x = fitted, y = modResid)) + geom_point() + geom_hline(yintercept = 0, colour = "red") + ggtitle(label = "WI Edu vs Tractor Residuals")
+
+
+#SCATTER DIAGRAM AND REGRESSION FOR WISCONSIN VAM VS EDU
+wis_vam <- subset(vam, state == "Wisconsin" & year == 1947)
+wis_vam[is.na(wis_vam)] <- 0
+plot(wis_tract$percent_farm_tractor, wis_vam$VAM, xlab = "% 1940", ylab = "VAM 1947", ylim = c(0,1000), main = "Wisconsin VAM vs % Tractor")
+abline(lm(wis_vam$VAM ~ wis_tract$percent_farm_tractor))
+```
+
+
+## WI EDU VS % SSE
+```{r}
+#Calculate SSE
+pred_wisEdu <- predict(wisEduMod, wisPlotSrc)
+#Undo log transformation
+pred_wisEdu <- exp(pred_wisEdu)-1
+
+mean((wisPlotSrc$avg - pred_wisEdu)^2)
+```
+
+
+## VAM 1958 vs % 1950
+```{r}
+wis1950 <- subset(df50,stateAbb == "WI" )
+wis1930 <- subset(df30,stateAbb == "WI" )
+vam_wis1957 <- subset(vam, year == 1958 & state == "Wisconsin")
+wisVam_mod <- lm(vam_wis1957$VAM ~ wis1950$percent_farm_tractor)
+summary(wisVam_mod)
+
+plot(wis1950$percent_farm_tractor, vam_wis1957$VAM, main = "Wisconsin - 1957 VAM vs 1950 %")
+abline(wisVam_mod, col = "red")
+```
+
+## VAM 1947 vs % 1930
+```{r}
+vam_wis1947 <- subset(vam, year == 1947 & state == "Wisconsin")
+wisVam_mod1947 <- lm(vam_wis1947$VAM ~ wis1930$percent_farm_tractor)
+summary(wisVam_mod1947)
+
+plot(wis1930$percent_farm_tractor, vam_wis1947$VAM, main = "Wisconsin - 1947 VAM vs 1930 %")
+abline(wisVam_mod1947, col = "red")
+```
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# INDIANA<a id="indiana-tractor-vam-plots"></a>
+```{r}
+
+#Indiana Edu
+in_edu <- eduDataFunc("Indiana")
+
+#Indiana Tractor
+in_tract <- tractDataFunc("IN")
+
+plot(in_tract$percent_farm_tractor, in_edu$avg, xlab = "1930 % Tractor", ylab = "1940 Avg. Edu", main = "Indiana")
+
+inPlotSrc <- merge(in_edu, in_tract, by = "county")
+
+#LOESS REGRESSION on EDU vs % Tractor
+ggplot(inPlotSrc,aes(x = percent_farm_tractor, y = avg)) + geom_point()  + geom_smooth() + xlab("1930's % Tractor") + ylab("1940 Avg. Edu") + ggtitle("Indiana")
+```
+
+
+#Transform response on Log Scale
+```{r}
+inPlotSrc$logAvg <- log(inPlotSrc$avg)
+
+plot(inPlotSrc$percent_farm_tractor, inPlotSrc$logAvg, main = "Log-Linear")
+inEduMod <- lm(logAvg ~ percent_farm_tractor, data = inPlotSrc)
+summary(inEduMod)
+
+#Residuals
+inPlotSrc$modResid <- resid(inEduMod)
+inPlotSrc$fitted <- predict(inEduMod)
+ggplot(inPlotSrc, aes(x = fitted, y = modResid)) + geom_point() + geom_hline(yintercept = 0, colour = "red") + ggtitle(label = "IN Edu vs Tractor Residuals")
+```
+
+#SCATTER DIAGRAM AND REGRESSION FOR Indiana VAM VS EDU
+```{r}
+in_vam <- subset(vam, state == "Indiana" & year == 1947)
+rownames(in_vam) <- 1:nrow(in_vam)
+in_vam <- in_vam[-75,]
+rownames(in_vam) <- 1:nrow(in_vam)
+in_vam[is.na(in_vam)] <- 0
+plot(in_tract$percent_farm_tractor, in_vam$VAM, xlab = "% 1940", ylab = "VAM 1947", ylim = c(0,1000), main = "Indiana VAM vs % Tractor")
+abline(lm(in_vam$VAM ~ in_tract$percent_farm_tractor))
+```
+
+#Indiana - Median
+```{r}
+
+inMedian <- eduMedianFunc("Indiana")
+
+plot(jitter(in_tract$percent_farm_tractor), jitter(inMedian$med), xlab = "% 1930", ylab ="Median years education", main = "Indiana- Median")
+inMedian$logMed <- log(inMedian$med)
+
+plot(jitter(in_tract$percent_farm_tractor), jitter(inMedian$logMed), xlab = "% 1930", ylab ="Median years education", main = "Indiana- LogMedian")
+```
+
+
+
+### Indiana - Median Model
+```{r}
+plotSrc_med_in <- merge(inMedian, in_tract, by = "county")
+inEduMod_med <- lm(logMed ~ percent_farm_tractor, data = plotSrc_med_in)
+summary(inEduMod_med)
+
+in_med_df <- as.data.frame(resid(inEduMod_med))
+in_med_df$county <- plotSrc_med_in$name
+colnames(in_med_df) <- c( "residual", "county")
+
+```
+
+
+### Indiana Median Model County Residuals
+```{r}
+in_med_df
+```
+## IN EDU VS % SSE
+```{r}
+#Calculate SSE
+pred_inEdu <- predict(inEduMod, inPlotSrc)
+#Undo log transformation
+pred_inEdu <- exp(pred_inEdu)-1
+
+mean((inPlotSrc$avg - pred_inEdu)^2)
+```
+
+## VAM 1958 vs % 1950
+```{r}
+in1950 <- subset(df50,stateAbb == "IN" )
+in1930 <- subset(df30,stateAbb == "IN" )
+vam_in1957 <- subset(vam, year == 1958 & state == "Indiana")
+inVam_mod <- lm(vam_in1957$VAM ~ in1950$percent_farm_tractor)
+summary(inVam_mod)
+
+plot(in1950$percent_farm_tractor, vam_in1957$VAM, main = "Indiana - 1957 VAM vs 1950 %")
+abline(inVam_mod, col = "red")
+```
+
+## VAM 1947 vs % 1930
+```{r}
+vam_in1947 <- subset(vam, year == 1947 & state == "Indiana")
+vam_in1947 <- vam_in1947[-75,]
+
+inVam_mod1947 <- lm(vam_in1947$VAM ~ in1930$percent_farm_tractor)
+summary(inVam_mod1947)
+
+plot(in1930$percent_farm_tractor, vam_in1947$VAM, main = "Indiana - 1947 VAM vs 1930 %")
+abline(inVam_mod1947, col = "red")
+```
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Illinois<a id="illinois-tractor-vam-plots"></a>
+
+```{r}
+#Illinois Edu
+il_edu <- eduDataFunc("Illinois")
+
+il_edu_med <- eduMedianFunc("Illinois")
+
+#Illinois Tractor
+il_tract <- tractDataFunc("IL")
+
+plot(il_tract$percent_farm_tractor, il_edu$avg, xlab = "1930 % Tractor", ylab = "1940 Avg. Edu", main = "Illinois")
+
+plot(il_tract$percent_farm_tractor, il_edu_med$med, xlab = "1930 % Tractor", ylab = "1940 Med. Edu", main = "Illinois")
+
+ilPlotSrc <- merge(il_edu, il_tract, by = "county")
+```
+#LOESS REGRESSION on EDU vs % Tractor
+```{r}
+ggplot(ilPlotSrc,aes(x = percent_farm_tractor, y = avg)) + geom_point()  + geom_smooth() + xlab("1930's % Tractor") + ylab("1940 Avg. Edu") + ggtitle("Illinois")
+```
+
+#Transform response on Log Scale
+```{r}
+ilPlotSrc$logAvg <- log(ilPlotSrc$avg)
+
+plot(ilPlotSrc$percent_farm_tractor, ilPlotSrc$logAvg, main = "Log-Linear")
+ilEduMod <- lm(logAvg ~ percent_farm_tractor, data = ilPlotSrc)
+summary(ilEduMod)
+```
+
+#Residuals - Mean Model
+```{r}
+ilPlotSrc$modResid <- resid(ilEduMod)
+ilPlotSrc$fitted <- predict(ilEduMod)
+ggplot(ilPlotSrc, aes(x = fitted, y = modResid)) + geom_point() + geom_hline(yintercept = 0, colour = "red") + ggtitle(label = "IL Edu vs Tractor Residuals")
+```
+
+
+#SCATTER DIAGRAM AND REGRESSION FOR Illinois VAM VS EDU
+```{r}
+il_vam <- subset(vam, state == "Illinois" & year == 1947)
+rownames(il_vam) <- 1:nrow(il_vam)
+il_vam[is.na(il_vam)] <- 0
+plot(il_tract$percent_farm_tractor, il_vam$VAM, xlab = "% 1940", ylab = "VAM 1947", ylim = c(0,1000), main = "Illinois VAM vs % Tractor")
+abline(lm(il_vam$VAM ~ il_tract$percent_farm_tractor))
+
+#Identify outliers
+ #outlier <- ilPlotSrc[c(35,54),]
+ #outlier
+```
+
+#Illinois - Median
+```{r}
+
+ilMedian <- eduMedianFunc("Illinois")
+
+plot(jitter(il_tract$percent_farm_tractor), jitter(ilMedian$med), xlab = "% 1930", ylab ="Median years education", main = "Illinois- Median")
+ilMedian$logMed <- log(ilMedian$med)
+
+plot(jitter(il_tract$percent_farm_tractor), jitter(ilMedian$logMed), xlab = "% 1930", ylab ="Median years education", main = "Illinois - LogMedian")
+```
+
+
+
+
+
+
+### Illinois - Median Model
+```{r}
+plotSrc_med_il <- merge(ilMedian, il_tract, by = "county")
+ilEduMod_med <- lm(logMed ~ percent_farm_tractor, data = plotSrc_med_il)
+summary(ilEduMod_med)
+
+il_med_df <- as.data.frame(resid(ilEduMod_med))
+il_med_df$county <- plotSrc_med_il$name
+colnames(il_med_df) <- c( "residual", "county")
+
+```
+
+### Illinois Median Model County Residuals
+```{r}
+il_med_df
+```
+
+
+## IL EDU VS % SSE
+```{r}
+#Calculate SSE
+pred_ilEdu <- predict(ilEduMod, ilPlotSrc)
+#Undo log transformation
+pred_ilEdu <- exp(pred_ilEdu)-1
+
+mean((ilPlotSrc$avg - pred_ilEdu)^2)
+```
+
+
+## VAM 1958 vs % 1950
+```{r}
+il1950 <- subset(df50,stateAbb == "IL" )
+vam_il1957 <- subset(vam, year == 1958 & state == "Illinois")
+ilVam_mod <- lm(vam_il1957$VAM ~ il1950$percent_farm_tractor)
+summary(ilVam_mod)
+
+plot(il1950$percent_farm_tractor, vam_il1957$VAM, main = "Illinois - 1957 VAM vs 1950 %")
+abline(ilVam_mod, col = "red")
+```
+
+## VAM 1947 vs % 1930
+```{r}
+il1930 <- subset(df30, stateAbb == "IL")
+ilVam_mod1947 <- lm(il_vam$VAM ~ il1930$percent_farm_tractor)
+summary(ilVam_mod1947)
+
+plot(il1930$percent_farm_tractor, il_vam$VAM, main = "Illinois - 1947 VAM vs 1930 %")
+abline(ilVam_mod1947, col = "red")
+```
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# IOWA<a id="iowa-tractor-vam-plots"></a>
+
+```{r}
+#Iowa Edu
+ia_edu <- eduDataFunc("Iowa")
+
+#Iowa Tractor
+ia_tract <- tractDataFunc("IA")
+
+plot(ia_tract$percent_farm_tractor, ia_edu$avg, xlab = "1930 % Tractor", ylab = "1940 Avg. Edu", main = "Iowa")
+
+iaPlotSrc <- merge(ia_edu, ia_tract, by = "county")
+```
+
+#LOESS REGRESSION on EDU vs % Tractor
+```{r}
+ggplot(iaPlotSrc,aes(x = percent_farm_tractor, y = avg)) + geom_point()  + geom_smooth() + xlab("1930's % Tractor") + ylab("1940 Avg. Edu") + ggtitle("Iowa")
+
+#Transform response on Log Scale
+iaPlotSrc$logAvg <- log(iaPlotSrc$avg)
+
+plot(iaPlotSrc$percent_farm_tractor, iaPlotSrc$logAvg, main = "Log-Linear")
+iaEduMod <- lm(logAvg ~ percent_farm_tractor, data = iaPlotSrc)
+summary(iaEduMod)
+```
+
+#Residuals
+```{r}
+iaPlotSrc$modResid <- resid(iaEduMod)
+iaPlotSrc$fitted <- predict(iaEduMod)
+ggplot(iaPlotSrc, aes(x = fitted, y = modResid)) + geom_point() + geom_hline(yintercept = 0, colour = "red") + ggtitle(label = "IA Edu vs Tractor Residuals")
+```
+
+#SCATTER DIAGRAM AND REGRESSION FOR Indiana VAM VS EDU
+```{r}
+ia_vam <- subset(vam, state == "Iowa" & year == 1947)
+rownames(ia_vam) <- 1:nrow(ia_vam)
+ia_vam[is.na(ia_vam)] <- 0
+plot(ia_tract$percent_farm_tractor, ia_vam$VAM, xlab = "% 1940", ylab = "VAM 1947", ylim = c(0,1000), main = "Iowa VAM vs % Tractor")
+abline(lm(ia_vam$VAM ~ ia_tract$percent_farm_tractor))
+```
+
+## IA EDU VS % Sum of Squares Error
+```{r}
+#Calculate SSE
+pred_iaEdu <- predict(iaEduMod, iaPlotSrc)
+#Undo log transformation
+pred_iaEdu <- exp(pred_iaEdu)-1
+
+mean((iaPlotSrc$avg - pred_iaEdu)^2)
+```
+
+## VAM 1958 vs % 1950
+```{r}
+ia1950 <- subset(df50,stateAbb == "IA" )
+vam_ia1957 <- subset(vam, year == 1958 & state == "Iowa")
+iaVam_mod <- lm(vam_ia1957$VAM ~ ia1950$percent_farm_tractor)
+summary(iaVam_mod)
+plot(ia1950$percent_farm_tractor, vam_ia1957$VAM, main = "Iowa - 1957 VAM vs 1950 %")
+abline(iaVam_mod, col = "red")
+
+```
+
+## VAM 1947 vs % 1930
+```{r}
+ia1930 <- subset(df30, stateAbb == "IA")
+iaVam_mod1947 <- lm(ia_vam$VAM ~ ia1930$percent_farm_tractor)
+summary(iaVam_mod1947)
+
+plot(ia1930$percent_farm_tractor, ia_vam$VAM, main = "Iowa - 1947 VAM vs 1930 %")
+abline(iaVam_mod1947, col = "red")
+```
+
+#Iowa - Median
+```{r}
+iaMedian <- eduMedianFunc("Iowa")
+
+plot(jitter(ia_tract$percent_farm_tractor), jitter(iaMedian$med), xlab = "% 1930", ylab ="Median years education", main = "Iowa - Median")
+iaMedian$logMed <- log(iaMedian$med)
+
+plot(jitter(ia_tract$percent_farm_tractor), jitter(iaMedian$logMed), xlab = "% 1930", ylab ="Median years education", main = "Iowa - LogMedian")
+```
+
+### Iowa - Median Model
+```{r}
+plotSrc_med_ia <- merge(iaMedian, ia_tract, by = "county")
+iaEduMod_med <- lm(logMed ~ percent_farm_tractor, data = plotSrc_med_ia)
+summary(iaEduMod_med)
+
+ia_med_df <- as.data.frame(resid(iaEduMod_med))
+ia_med_df$county <- plotSrc_med_ia$name
+colnames(ia_med_df) <- c( "residual", "county")
+
+```
+
+### Iowa Median Model County Residuals
+```{r}
+ia_med_df
+```
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# VAM REGRESSION<a id="vam-regression"></a>
+
+## Regressing VAM on Logistic Params for years 1954 and 1958
+
+```{r data}
+params <- read.csv("Tractor_Raw_Data/TractorCoef.csv")
+vam <- read.csv("vamFipsData.csv")
+params[,1] <- NULL
+vam[,1] <- NULL
+```
+
+## Merge params DF and vam DF
+
+```{r pressure, echo=FALSE}
+df <- merge(params, vam, by = "fips", all = FALSE)
+df[,c(7,8,9,12,13,14,15,16)] <- NULL
+
+```
+
+INFO:
+
+The dataset i'm using matches each county and year to their corresponding logistic params.(Slope, Ceiling, Mid)
+Any counties with a Negative slope have been removed
+Any counties with a ceiling > 1 have been removed. 
+Any counties with a midpoint before 1900 or after 1980 have been removed
+Any counties with VAM as NA have been removed
+Any counties with VAM as 0 have been removed
+
+```{r}
+#remove high ceilings
+df <- df[df$Ceiling <= 1, ]
+df <- df[df$Mid > 1940,]
+df <- df[df$Mid < 1960,]
+df <- df[!is.na(df$VAM),]
+#Remove response variables that are 0
+df <- df[which(df$VAM > 0),]
+write.csv(df, "filtered_df.csv")
+```
+
+
+The next step necessary for fitting a logistic is to create a binary response
+
+I've set the `response` as a binary value(1 = "Success", 0 = "Failure"), this value was determined by wether a county had VAM of > 250 or not. This is arbritary and can be played with to see if it changes the result.
+I chose 250 b/c the range of VAM is (1,999) however majority of these values are below 500 so it seemed like a good starting point.
+
+```{r}
+df$response <- ifelse(df$VAM >= 250, 1, 0)
+```
+
+
+
+Before subsetting the data and get into modeling, I want to remove any N/A's.
+```{r}
+unique(is.na(df))
+```
+As seen above, none of the columns contain any N/A values
+
+
+
+
+
+
+Below is a glimpse at the current dataset that will be used in the modeling. Next step is to reduce the observations to only rows that correspond to the years 1954 or 1958
+
+```{r}
+head(df)
+```
+
+
+```{r}
+df.54 <- subset(df, year == 1954)
+rownames(df.54) <- 1:nrow(df.54)
+df.58 <- subset(df, year == 1958)
+rownames(df.58) <- 1:nrow(df.58)
+```
+
+Glimpse into 1954 dataset
+
+```{r}
+head(df.54)
+```
+
+Glimpse into 1958 dataset
+```{r}
+head(df.58)
+```
+
+
+
+#1954 Training and Test Set
+
+```{r}
+smp_size <- floor(.7 * nrow(df.54))
+set.seed(123)
+train_ind <- sample(seq_len(nrow(df.54)), size = smp_size)
+
+df.54.train <- df.54[train_ind,]
+
+df.54.test <- df.54[-train_ind,]
+
+```
+
+
+# 1954 Model w/o Transformations and Plots 
+
+Below are some exploratory plots containing the predictor features for year 1954.
+
+The main one that I want to point out is [VAM vs. Slope], it seems counter-intuitive to me that as the slope increase for the county, the VAM is decreasing. 
+
+Maybe you have some other insight into this??
+
+```{r 54Model, echo=FALSE}
+plot(df.54$Slope, df.54$VAM, main = "1954", xlab = "Slope")
+plot(df.54$Mid, df.54$VAM, main = "1954", xlab  = "Mid")
+plot(df.54$Ceiling, df.54$VAM, main = "1954", xlab = "Ceiling")
+ggplot(df.54,aes(x = Slope, y = VAM)) + geom_point()  + geom_smooth(method =  "lm") + ggtitle("1954")
+
+sapply(df, class)
+```
+
+# 54 Model Summary
+
+Below is the actual modeling for year 1954 on training set
+```{r}
+model <- glm(response ~ Slope + Ceiling + Mid,  data = df.54.train, family=binomial(link = "logit"))
+summary(model)
+predicted.54 <- plogis(predict(model, df.54.test))
+```
+
+Looking at the model summary above ^, this tells me that as both slope and mid increase independent of one another, VAM will decrease. However, as the Ceiling parameter increases, VAM will increase with. I'm not sure how to interpret this, maybe to be discussed??
+
+```{r, echo = FALSE}
+#Find Optimal Prediction cutoff
+optCutOff <- optimalCutoff(df.54.test$response, predicted.54)
+
+#Misclassification Error
+misClassError(df.54.test$response, predicted.54, threshold = optCutOff)
+
+
+#ROC Curve
+plotROC(df.54.test, predicted.54)
+```
+
+This model is able to predict `Success` counties 30% of the time, doesn't seem very good but at the same time we dont have much to work with
+```{r}
+#Sensitivity(Truth Detection Rate)
+sensitivity(df.54.test$response, predicted.54, threshold = optCutOff)
+confusionMatrix(df.54.test$response, predicted.54, threshold = optCutOff)
+```
+
+
+## 1954 Model w/ Transformations
+
+Exploratory plots for predictor features log-transformed
+```{r 1954Trans}
+trans54.df.train <- df.54.train
+trans54.df.test <- df.54.test
+trans54.df.train$Ceiling <- log(trans54.df.train$Ceiling)
+trans54.df.test$Ceiling <- log(trans54.df.test$Ceiling)
+trans54.df.train$Slope <- log(trans54.df.train$Slope)
+trans54.df.test$Slope <- log(trans54.df.test$Slope)
+
+
+#Plots for Transformed Predictors in Year 1954
+plot(trans54.df.train$Slope, trans54.df.train$VAM, main = "1954", xlab = "Slope")
+plot(trans54.df.train$Ceiling, trans54.df.train$VAM, main = "1954", xlab = "Ceiling")
+plot(trans54.df.train$Mid, trans54.df.train$VAM, main = "1954", xlab = "Mid")
+```
+
+Modeling for transformed predicgtors for year 1954
+
+We see below, same general results, VAM decreases with SLope and Mid but increases with Ceiling
+```{r}
+model.trans <- glm(response ~ Slope + Ceiling + Mid,  data = trans54.df.train, family=binomial(link="logit"))
+summary(model.trans)
+```
+
+
+Evaluating this transformed model's goodness of fit below
+```{r}
+predicted.54.trans <- plogis(predict(model.trans, trans54.df.test))
+
+#Find Optimal Prediction cutoff
+optCutOff <- optimalCutoff(trans54.df.test$response, predicted.54.trans)
+
+#Misclassification Error
+misClassError(trans54.df.test$response, predicted.54.trans, threshold = optCutOff)
+
+
+#ROC Curve
+plotROC(trans54.df.test, predicted.54.trans)
+
+
+
+#Sensitivity(Truth Detection Rate)
+sensitivity(trans54.df.test$response, predicted.54.trans, threshold = optCutOff)
+
+```
+The transformed model above is able to predict `Success` counties 21% of the time so this is worse than the non-transformed model
+
+
+## 1958
+
+Model for year 1958 below
+
+#1958 Training and Test Set
+
+```{r}
+smp_size <- floor(.7 * nrow(df.58))
+set.seed(123)
+train_ind <- sample(seq_len(nrow(df.58)), size = smp_size)
+
+df.58.train <- df.58[train_ind,]
+
+df.58.test <- df.58[-train_ind,]
+
+```
+
+
+
+# Exploratory plots for year 1958
+
+```{r 58model, echo=FALSE}
+plot(df.58$Slope, df.58$VAM)
+plot(df.58$Mid, df.58$VAM)
+plot(df.58$Ceiling, df.58$VAM)
+plot(df.58.train$Mid, df.58.train$VAM)
+ggplot(df.58,aes(x = Slope, y = VAM)) + geom_point()  + geom_smooth(method =  "lm") + ggtitle("1958")
+```
+
+
+# 1958 Modeling
+```{r}
+model <- glm(response ~ Slope + Ceiling + Mid,  data = df.58.train, family="binomial")
+summary(model)
+
+
+predicted.58 <- plogis(predict(model, df.58.test))
+
+#Find Optimal Prediction cutoff
+optCutOff <- optimalCutoff(df.58.test$response, predicted.58)
+
+#Misclassification Error
+misClassError(df.58.test$response, predicted.58, threshold = optCutOff)
+
+
+#ROC Curve
+plotROC(df.58.test, predicted.58)
+
+
+
+#Sensitivity(Truth Detection Rate)
+sensitivity(df.58.test$response, predicted.58, threshold = optCutOff)
+
+```
+
+Interestingly enough thoughm the 1958 model is able to predict `Success ` counties 47% of the time, this is by far the best.
+
+
+
+
+
+
+
+
+
+# MidWestern States training and test
+```{r}
+
+#Oh, MI, MN, IL, IN, WI 
+midWest <- subset(df, State == "OH" | State == "MI" | State == "MN" | State == "IL" | State == "IN" | State == "WI")
+smp_size <- floor(.7 * nrow(midWest))
+set.seed(123)
+train_ind <- sample(seq_len(nrow(midWest)), size = smp_size)
+
+midWest.train <- midWest[train_ind,]
+
+midWest.test <- midWest[-train_ind,]
+
+```
+
+Exploring only midwestern states
+```{r}
+
+
+#Plots for Transformed Predictors in Year 1954
+plot(midWest$Slope, midWest$VAM)
+plot(midWest$Ceiling, midWest$VAM)
+plot(midWest$Mid, midWest$VAM)
+
+#Response on X-Axis
+plot(midWest$VAM, midWest$Ceiling)
+
+
+
+model_midWest <- glm(response ~ Slope + Ceiling + Mid,  data = midWest.train, family=binomial(link = "logit"))
+summary(model_midWest)
+
+
+predicted.midWest <- plogis(predict(model_midWest, midWest.test))
+
+#Find Optimal Prediction cutoff
+optCutOff <- optimalCutoff(midWest.test$response, predicted.midWest)
+
+#Misclassification Error
+misClassError(midWest.test$response, predicted.midWest, threshold = optCutOff)
+
+
+#ROC Curve
+plotROC(midWest.test, predicted.midWest)
+
+
+
+#Sensitivity(Truth Detection Rate)
+sensitivity(midWest.test$response, predicted.midWest, threshold = optCutOff)
+```
+
+Midwest model is no good, 12% sucess in prediction, however there aren't many observations so this was to be expected. 
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+# Tractor Diffusion Region<a id="tractorregion"></a>
+
+
+```{r dataRegion, echo = FALSE}
+rolledUp_all <- read_csv("Tractor_Raw_Data/rolledUp_all.csv")
+rolledUp_all$X1 <- NULL
+```
+
+
+
+```{r regionDiff, echo=FALSE}
+library(ggplot2)
+
+# South-Central(AL, MS, TN) within region plot
+southCentral <- subset(rolledUp_all, stateAbb %in% c("AL", "MS", "TN"))
+ggplot(southCentral, aes(x = year, y = percent)) +
+  geom_line(aes(group = stateAbb, colour = stateAbb)) +
+  labs(title = " South-Central within region diffusion", x = "Year", y = "% Farms w/ Tractors")
+
+rolledUp_southCentral <- southCentral %>% 
+  group_by(year) %>%
+  summarise(percent = sum(percent)/3, region = "SC")
+
+# South-West(AR,OK,LA,TX) within region plot
+southWest <- subset(rolledUp_all, stateAbb %in% c("AR", "OK", "LA", "TX"))
+ggplot(southWest, aes(x = year, y = percent)) +
+  geom_line(aes(group = stateAbb, colour = stateAbb)) +
+  labs(title = " South-West within region diffusion", x = "Year", y = "% Farms w/ Tractors")
+
+rolledUp_southWest <- southWest %>% 
+  group_by(year) %>%
+  summarise(percent = sum(percent)/3, region = "SW")
+
+
+# South-East(NC,SC,GA,FL) within region plot
+southEast <- subset(rolledUp_all, stateAbb %in% c("NC", "SC", "GA", "FL"))
+ggplot(southEast, aes(x = year, y = percent)) +
+  geom_line(aes(group = stateAbb, colour = stateAbb)) +
+  labs(title = "South-East within region diffusion", x = "Year", y = "% Farms w/ Tractors")
+
+rolledUp_southEast <- southEast %>% 
+  group_by(year) %>%
+  summarise(percent = sum(percent)/3, region = "SE")
+
+
+
+
+
+```
+
+# Visualize diffusion by the 3 regions
+```{r regionRolledUpDiff, echo =FALSE}
+regions <- rbind(rolledUp_southCentral, rolledUp_southEast, rolledUp_southWest)
+
+ggplot(regions, aes(x = year, y = percent)) +
+  geom_line(aes(group = region, colour = region)) +
+  labs(title = " Between Region diffusion", x = "Year", y = "% Farms w/ Tractors")
+
+```
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2020-11-05T00:00:00-05:00">November 5, 2020</time></p>
+        
+      </footer>
+
+      
+
+      
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2020 Kyle Amyx. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

@@ -10,78 +10,127 @@ output:
 
 
 
-## R Markdown
+## F1 Predictive Modeling
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+I can't currently find the source of data but it is an extensive set made of multiple tables for years (1950-2017)
 
 
 
 ```r
-8*8
+x = c(rep(1,10), 1:5, 1:5, rep(1,10), 9:13, rep(11,10), 9:10)
+y <- c(1:10, rep(10, 5), rep(7,5), 1:10, rep(1, 5),  1:10, 8:9)
+
+plot(x,y, pch=19, xlab="", ylab = "", xaxt="n", yaxt="n")
 ```
 
+![](2020-04-05-formula-one_files/figure-html/F1 Header-1.png)<!-- -->
+
+```r
+qplot(x= x, y=y)
 ```
-## [1] 64
-```
+
+![](2020-04-05-formula-one_files/figure-html/F1 Header-2.png)<!-- -->
+
+Data is broken down into multiple csv files which will need to be joined on common parameters to gain any insights:
+* Circuits
+* Lap Times
+* Races
+* Drivers
+* Driver Standings
+* Results
+* More used for reference
 
 
 ```r
 circuits = read.csv("Data(1950_2017)/circuits.csv")
-races = read.csv("Data(1950_2017)/races.csv")
+lapTimes = read.csv("Data(1950_2017)/lapTimes.csv", stringsAsFactors = FALSE)
+races = read.csv("Data(1950_2017)/races.csv", stringsAsFactors = FALSE)
 ```
 
 ```
-## Warning in scan(file = file, what = what, sep = sep, quote = quote, dec =
-## dec, : embedded nul(s) found in input
+## Warning in scan(file = file, what = what, sep = sep, quote = quote, dec = dec, :
+## embedded nul(s) found in input
 ```
 
 ```r
 results = read.csv("Data(1950_2017)/results.csv")
 drivers = read.csv("Data(1950_2017)/drivers.csv")
+driverStandings = read.csv("Data(1950_2017)/driverStandings.csv")
 ```
 
+
+Let's start by exploring the `Drivers` dataset.
+
+```r
+# What data types are the features in this set?
+sapply(drivers, class)
+```
+
+```
+##    driverId   driverRef      number        code    forename     surname
+##   "integer"    "factor"   "integer"    "factor"    "factor"    "factor"
+##         dob nationality         url
+##    "factor"    "factor"    "factor"
+```
+
+# Drivers
+
+F1 is scored in points, looking at which drivers have the most all-time points. Keep in mind this is dating back to 1950. I'm not familiar if the way Grand Prix are scored has changed. It's safe to say that for our purpose of predicting future grand prix winners, we will narrow our focus to current drivers. However out of curiousity, let's look at the all time high scorers.
 
 
 ```r
-summary(circuits)
+drivers_ = merge(drivers, driverStandings, by="driverId")
+
+driverPoints = drivers_ %>%
+  group_by(driverId, driverRef, dob) %>%
+  summarize(points = sum(points))
+
+ggplot(data = driverPoints, aes(x=driverId,y=points, label=driverRef)) + geom_point()
 ```
 
+![](2020-04-05-formula-one_files/figure-html/unnamed-chunk-1-1.png)<!-- -->
+
+
+Too much, cut off at 10,000 points and label
+
+```r
+fil = as_tibble(driverPoints) %>%
+  select(driverId, points, driverRef) %>%
+  group_by(driverId,  driverRef) %>%
+  summarise(points = sum(points))
+fil = fil[fil$points > 10000,]
+  ggplot(data = fil, aes(x=driverId, y = points, label = driverRef)) + geom_point() + geom_label()
 ```
-##    circuitId        circuitRef                             name
-##  Min.   : 1   adelaide   : 1   A1-Ring                       : 1
-##  1st Qu.:19   ain-diab   : 1   Adelaide Street Circuit       : 1
-##  Median :37   aintree    : 1   Ain Diab                      : 1
-##  Mean   :37   albert_park: 1   Aintree                       : 1
-##  3rd Qu.:55   americas   : 1   Albert Park Grand Prix Circuit: 1
-##  Max.   :73   anderstorp : 1   Aut\xcc_dromo do Estoril      : 1
-##               (Other)    :67   (Other)                       :67
-##        location     country        lat              lng
-##  Barcelona : 2   USA    :11   Min.   :-37.85   Min.   :-118.189
-##  California: 2   France : 7   1st Qu.: 33.58   1st Qu.:  -9.394
-##  Spielburg : 2   Spain  : 6   Median : 41.37   Median :   3.931
-##  Abu Dhabi : 1   UK     : 4   Mean   : 33.87   Mean   :   1.723
-##  Adelaide  : 1   Austria: 3   3rd Qu.: 47.22   3rd Qu.:  14.765
-##  Anderstorp: 1   Belgium: 3   Max.   : 57.27   Max.   : 144.968
-##  (Other)   :64   (Other):39
-##       alt
-##  Min.   :10
-##  1st Qu.:10
-##  Median :10
-##  Mean   :10
-##  3rd Qu.:10
-##  Max.   :10
-##  NA's   :72
-##                                                                   url
-##  http://en.wikipedia.org/wiki/A1-Ring                               : 1
-##  http://en.wikipedia.org/wiki/Adelaide_Street_Circuit               : 1
-##  http://en.wikipedia.org/wiki/Ain-Diab_Circuit                      : 1
-##  http://en.wikipedia.org/wiki/Aintree_Motor_Racing_Circuit          : 1
-##  http://en.wikipedia.org/wiki/Aut%C3%B3dromo_do_Estoril             : 1
-##  http://en.wikipedia.org/wiki/Aut%C3%B3dromo_Hermanos_Rodr%C3%ADguez: 1
-##  (Other)                                                            :67
+
+![](2020-04-05-formula-one_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
+
+Not a very good visual, we can better compare the drivers points with a bar/histogram style
+
+```r
+  ggplot(data = fil, aes(x=reorder(driverRef, points), y=points, fill=points)) + geom_bar(stat="sum") + ggtitle("Top drivers by points") +
+  xlab("Driver Name") + ylab("Points") +
+  scale_x_discrete(labels = function(labels) {
+    fixedLabels <- c()
+    for(n in 1:length(labels)) {
+      fixedLabels[n] <- paste0(ifelse(n %% 2 ==0, "" ,"\n"), labels[n])
+    }
+    return(fixedLabels)
+  })
 ```
+
+![](2020-04-05-formula-one_files/figure-html/top driver hist-1.png)<!-- -->
+
+
+
+
+Are all of these drivers still alive and competing?
+
+
+
+
+# Races
+
 
 
 ```r
@@ -96,24 +145,135 @@ summary(races)
 ##  Mean   : 500   Mean   :1989   Mean   : 8.234   Mean   :21.76
 ##  3rd Qu.: 748   3rd Qu.:2005   3rd Qu.:12.000   3rd Qu.:30.00
 ##  Max.   :1009   Max.   :2018   Max.   :21.000   Max.   :73.00
+##      name               date               time               url
+##  Length:997         Length:997         Length:997         Length:997
+##  Class :character   Class :character   Class :character   Class :character
+##  Mode  :character   Mode  :character   Mode  :character   Mode  :character
 ##
-##                  name             date           time
-##  British Grand Prix: 69   1950-05-13:  1           :731
-##  Italian Grand Prix: 69   1950-05-21:  1   12:00:00:118
-##  Monaco Grand Prix : 65   1950-05-30:  1   14:00:00: 28
-##  Belgian Grand Prix: 63   1950-06-04:  1   06:00:00: 20
-##  German Grand Prix : 63   1950-06-18:  1   13:00:00: 14
-##  French Grand Prix : 59   1950-07-02:  1   16:00:00: 12
-##  (Other)           :609   (Other)   :991   (Other) : 74
-##                                                    url
-##  http://en.wikipedia.org/wiki/1950_Belgian_Grand_Prix:  1
-##  http://en.wikipedia.org/wiki/1950_British_Grand_Prix:  1
-##  http://en.wikipedia.org/wiki/1950_French_Grand_Prix :  1
-##  http://en.wikipedia.org/wiki/1950_Indianapolis_500  :  1
-##  http://en.wikipedia.org/wiki/1950_Italian_Grand_Prix:  1
-##  http://en.wikipedia.org/wiki/1950_Monaco_Grand_Prix :  1
-##  (Other)                                             :991
+##
+##
 ```
+Let's do some EDA on the circuits. Take a look at which races have the shortest lap time.
+
+```r
+driver_laps <- merge(races, lapTimes, by = "raceId")
+head(driver_laps)
+```
+
+```
+##   raceId year round circuitId                  name       date   time.x
+## 1      1 2009     1         1 Australian Grand Prix 2009-03-29 06:00:00
+## 2      1 2009     1         1 Australian Grand Prix 2009-03-29 06:00:00
+## 3      1 2009     1         1 Australian Grand Prix 2009-03-29 06:00:00
+## 4      1 2009     1         1 Australian Grand Prix 2009-03-29 06:00:00
+## 5      1 2009     1         1 Australian Grand Prix 2009-03-29 06:00:00
+## 6      1 2009     1         1 Australian Grand Prix 2009-03-29 06:00:00
+##                                                       url driverId lap position
+## 1 http://en.wikipedia.org/wiki/2009_Australian_Grand_Prix        7   5       15
+## 2 http://en.wikipedia.org/wiki/2009_Australian_Grand_Prix        7   6       16
+## 3 http://en.wikipedia.org/wiki/2009_Australian_Grand_Prix        7   7       16
+## 4 http://en.wikipedia.org/wiki/2009_Australian_Grand_Prix        7   8       16
+## 5 http://en.wikipedia.org/wiki/2009_Australian_Grand_Prix        7   9       16
+## 6 http://en.wikipedia.org/wiki/2009_Australian_Grand_Prix        7  10       16
+##     time.y milliseconds
+## 1 1:32.565        92565
+## 2 1:33.294        93294
+## 3 1:30.891        90891
+## 4 1:31.645        91645
+## 5 1:52.298       112298
+## 6 1:40.160       100160
+```
+
+```r
+# Only looking at last 10 years
+driver_laps <- driver_laps[driver_laps$year > 2008,]
+#Add driver name to set
+driver_laps <- merge(driver_laps, drivers[,1:2], by = "driverId")
+length(unique(driver_laps$circuitId))
+```
+
+```
+## [1] 26
+```
+
+```r
+length(unique(driver_laps$raceId))
+```
+
+```
+## [1] 173
+```
+
+```r
+temp = driver_laps %>%
+  group_by(driverRef, circuitId, raceId, name)
+
+prix_list = races[races$year > 2015,]
+prix_list = unique(prix_list$name)
+
+temp = temp[as.character(temp$name) %in% prix_list,]
+unique(temp$circuitId)
+```
+
+```
+##  [1] 73 18 11 10 20  6 15  3 24  4  9  1  7 17  2 70 32 12 13 14 71 22 69
+```
+
+```r
+for(i in 1:length(prix_list)){
+set = temp %>%
+  group_by(driverRef) %>%
+  filter(driverRef %in% driverId_vec) %>%
+  filter(name == prix_list[i]) %>%
+  summarise(avg = mean(milliseconds))
+  driverLapTimePlot = ggplot(data = set, aes(x= reorder(driverRef,avg), y = avg, fill = avg)) + geom_bar(stat="sum") + ggtitle(prix_list[i]) + scale_x_discrete(labels = function(labels){
+    fixedLabels = c()
+    for(n in 1:length(labels)){
+      fixedLabels[n] = paste0(ifelse(n %% 2 == 0, "", "\n"), labels[n])
+    }
+    return(fixedLabels)
+  }
+  )
+  print(driverLapTimePlot)
+}
+```
+
+![](2020-04-05-formula-one_files/figure-html/race-laptimes-1.png)<!-- -->![](2020-04-05-formula-one_files/figure-html/race-laptimes-2.png)<!-- -->![](2020-04-05-formula-one_files/figure-html/race-laptimes-3.png)<!-- -->
+
+```
+## Warning: Removed 836 rows containing non-finite values (stat_sum).
+```
+
+![](2020-04-05-formula-one_files/figure-html/race-laptimes-4.png)<!-- -->![](2020-04-05-formula-one_files/figure-html/race-laptimes-5.png)<!-- -->![](2020-04-05-formula-one_files/figure-html/race-laptimes-6.png)<!-- -->![](2020-04-05-formula-one_files/figure-html/race-laptimes-7.png)<!-- -->![](2020-04-05-formula-one_files/figure-html/race-laptimes-8.png)<!-- -->
+
+```
+## Warning: Removed 836 rows containing non-finite values (stat_sum).
+```
+
+![](2020-04-05-formula-one_files/figure-html/race-laptimes-9.png)<!-- -->![](2020-04-05-formula-one_files/figure-html/race-laptimes-10.png)<!-- -->![](2020-04-05-formula-one_files/figure-html/race-laptimes-11.png)<!-- -->![](2020-04-05-formula-one_files/figure-html/race-laptimes-12.png)<!-- -->![](2020-04-05-formula-one_files/figure-html/race-laptimes-13.png)<!-- -->![](2020-04-05-formula-one_files/figure-html/race-laptimes-14.png)<!-- -->![](2020-04-05-formula-one_files/figure-html/race-laptimes-15.png)<!-- -->![](2020-04-05-formula-one_files/figure-html/race-laptimes-16.png)<!-- -->![](2020-04-05-formula-one_files/figure-html/race-laptimes-17.png)<!-- -->![](2020-04-05-formula-one_files/figure-html/race-laptimes-18.png)<!-- -->
+
+```
+## Warning: Removed 836 rows containing non-finite values (stat_sum).
+```
+
+![](2020-04-05-formula-one_files/figure-html/race-laptimes-19.png)<!-- -->![](2020-04-05-formula-one_files/figure-html/race-laptimes-20.png)<!-- -->![](2020-04-05-formula-one_files/figure-html/race-laptimes-21.png)<!-- -->
+
+```
+## Warning: Removed 838 rows containing non-finite values (stat_sum).
+```
+
+![](2020-04-05-formula-one_files/figure-html/race-laptimes-22.png)<!-- -->
+
+```
+## Warning: Removed 842 rows containing non-finite values (stat_sum).
+```
+
+![](2020-04-05-formula-one_files/figure-html/race-laptimes-23.png)<!-- -->
+
+
+
+
+# Results
 
 
 ```r
@@ -169,22 +329,22 @@ summary(drivers)
 ```
 
 ```
-##     driverId         driverRef       number           code
-##  Min.   :  1.0   abate    :  1   Min.   : 2.00          :757
-##  1st Qu.:211.2   abecassis:  1   1st Qu.:10.25   BIA    :  2
-##  Median :421.5   acheson  :  1   Median :21.50   HAR    :  2
-##  Mean   :421.5   adamich  :  1   Mean   :30.50   MAG    :  2
-##  3rd Qu.:631.8   adams    :  1   3rd Qu.:38.25   VER    :  2
-##  Max.   :843.0   ader     :  1   Max.   :99.00   ALB    :  1
-##                  (Other)  :836   NA's   :804     (Other): 76
-##     forename         surname            dob         nationality
-##  John   : 14   Taylor    :  5   02/10/1921:  2   British  :162
-##  Mike   : 14   Wilson    :  4   04/09/1920:  2   American :157
-##  Peter  : 13   Brabham   :  3   05/05/1932:  2   Italian  : 99
-##  Bill   : 11   Brown     :  3   06/06/1923:  2   French   : 73
-##  Tony   : 11   Fittipaldi:  3   06/10/1918:  2   German   : 49
-##  Bob    : 10   Hill      :  3   12/12/1946:  2   Brazilian: 31
-##  (Other):769   (Other)   :821   (Other)   :830   (Other)  :271
+##     driverId         driverRef       number           code        forename
+##  Min.   :  1.0   abate    :  1   Min.   : 2.00          :757   John   : 14
+##  1st Qu.:211.2   abecassis:  1   1st Qu.:10.25   BIA    :  2   Mike   : 14
+##  Median :421.5   acheson  :  1   Median :21.50   HAR    :  2   Peter  : 13
+##  Mean   :421.5   adamich  :  1   Mean   :30.50   MAG    :  2   Bill   : 11
+##  3rd Qu.:631.8   adams    :  1   3rd Qu.:38.25   VER    :  2   Tony   : 11
+##  Max.   :843.0   ader     :  1   Max.   :99.00   ALB    :  1   Bob    : 10
+##                  (Other)  :836   NA's   :804     (Other): 76   (Other):769
+##        surname            dob         nationality
+##  Taylor    :  5   02/10/1921:  2   British  :162
+##  Wilson    :  4   04/09/1920:  2   American :157
+##  Brabham   :  3   05/05/1932:  2   Italian  : 99
+##  Brown     :  3   06/06/1923:  2   French   : 73
+##  Fittipaldi:  3   06/10/1918:  2   German   : 49
+##  Hill      :  3   12/12/1946:  2   Brazilian: 31
+##  (Other)   :821   (Other)   :830   (Other)  :271
 ##                                                           url
 ##                                                             :  1
 ##  http://en.wikipedia.org/wiki/%C3%89lie_Bayol               :  1
@@ -194,6 +354,10 @@ summary(drivers)
 ##  http://en.wikipedia.org/wiki/A.J._Foyt                     :  1
 ##  (Other)                                                    :836
 ```
+
+
+Let's create our `MASTER` set here, containing all info we can foresee as necessary going forward.
+
 
 ## Including Plots
 
