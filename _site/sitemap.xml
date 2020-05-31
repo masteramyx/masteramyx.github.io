@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>http://localhost:4000/formula-one/</loc>
-<lastmod>2020-01-05T00:00:00-05:00</lastmod>
-</url>
-<url>
 <loc>http://localhost:4000/tractor-regression/</loc>
 <lastmod>2020-03-09T00:00:00-04:00</lastmod>
 </url>
 <url>
 <loc>http://localhost:4000/tractor/</loc>
 <lastmod>2020-03-09T00:00:00-04:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/2020-04-05-formula-one/</loc>
+<lastmod>2020-05-31T10:53:49-04:00</lastmod>
 </url>
 <url>
 <loc>http://localhost:4000/_posts/2020-03-09-tractor-regression/</loc>
@@ -96,18 +96,6 @@
 <url>
 <loc>http://localhost:4000/assets/reports/VamRegression.pdf</loc>
 <lastmod>2020-05-02T09:22:47-04:00</lastmod>
-</url>
-<url>
-<loc>http://localhost:4000/formula-one/2020-04-05-formula-one.html</loc>
-<lastmod>2020-05-31T10:52:14-04:00</lastmod>
-</url>
-<url>
-<loc>http://localhost:4000/formula-one/ggplot-cheatsheet.pdf</loc>
-<lastmod>2020-05-31T10:52:14-04:00</lastmod>
-</url>
-<url>
-<loc>http://localhost:4000/formula-one/rmarkdown-cheatsheet.pdf</loc>
-<lastmod>2020-05-31T10:52:14-04:00</lastmod>
 </url>
 <url>
 <loc>http://localhost:4000/tractor/2020-03-09-tractor.html</loc>
