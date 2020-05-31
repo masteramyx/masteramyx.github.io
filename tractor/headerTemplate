@@ -1,0 +1,33 @@
+---
+title: "Tractor"
+author: "Kyle Amyx"
+date: 2020-03-09
+tags: [EDA, regression]
+header:
+  image: "../assets/images/tractor/tractorHeaderImg4.jpg"
+excerpt: "Data Science"
+classes: wide
+output:
+  html_document:
+    keep_md: true
+---
+
+
+Replace this in _site/_posts/post/index.html document
+and
+_site/post/index.html doc
+```
+  <div class="author__content">
+
+      <h3 class="author__name" itemprop="name">Kyle Amyx</h3>
+
+
+      <div class="author__bio" itemprop="description">
+        <p>Data Science Portfolio</p>
+
+      </div>
+
+  </div>
+
+
+```

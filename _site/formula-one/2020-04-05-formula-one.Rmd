@@ -132,6 +132,8 @@
               <a href="/about/" >About</a>
             </li><li class="masthead__menu-item">
               <a href="/datascience/" >Data science</a>
+            </li><li class="masthead__menu-item">
+              <a href="/android/" >Mobile Dev</a>
             </li></ul>
         
         <button class="greedy-nav__toggle hidden" type="button">
@@ -256,37 +258,148 @@
         
         ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)
+library(tidyverse, ggplot2)
 ```
 
-## R Markdown
+## F1 Predictive Modeling
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+I can't currently find the source of data but it is an extensive set made of multiple tables for years (1950-2017)
 
 
 ```{r F1 Header}
-8*8
+x = c(rep(1,10), 1:5, 1:5, rep(1,10), 9:13, rep(11,10), 9:10)
+y <- c(1:10, rep(10, 5), rep(7,5), 1:10, rep(1, 5),  1:10, 8:9)
+
+plot(x,y, pch=19, xlab="", ylab = "", xaxt="n", yaxt="n")
+qplot(x= x, y=y)
 
 ```
+
+Data is broken down into multiple csv files which will need to be joined on common parameters to gain any insights:
+* Circuits
+* Lap Times
+* Races
+* Drivers
+* Driver Standings
+* Results
+* More used for reference
 
 ```{r data}
 circuits = read.csv("Data(1950_2017)/circuits.csv")
-races = read.csv("Data(1950_2017)/races.csv")
+lapTimes = read.csv("Data(1950_2017)/lapTimes.csv", stringsAsFactors = FALSE)
+races = read.csv("Data(1950_2017)/races.csv", stringsAsFactors = FALSE)
 results = read.csv("Data(1950_2017)/results.csv")
 drivers = read.csv("Data(1950_2017)/drivers.csv")
+driverStandings = read.csv("Data(1950_2017)/driverStandings.csv")
 
 ```
 
 
-```{r cars}
-summary(circuits)
+Let's start by exploring the `Drivers` dataset. 
+```{r drivers-overview}
+# What data types are the features in this set?
+sapply(drivers, class)
 ```
+
+# Drivers
+
+F1 is scored in points, looking at which drivers have the most all-time points. Keep in mind this is dating back to 1950. I'm not familiar if the way Grand Prix are scored has changed. It's safe to say that for our purpose of predicting future grand prix winners, we will narrow our focus to current drivers. However out of curiousity, let's look at the all time high scorers. 
+
+```{r}
+
+drivers_ = merge(drivers, driverStandings, by="driverId")
+
+driverPoints = drivers_ %>% 
+  group_by(driverId, driverRef, dob) %>% 
+  summarize(points = sum(points))
+
+ggplot(data = driverPoints, aes(x=driverId,y=points, label=driverRef)) + geom_point() 
+```
+
+
+Too much, cut off at 10,000 points and label
+```{r}
+fil = as_tibble(driverPoints) %>%
+  select(driverId, points, driverRef) %>%
+  group_by(driverId,  driverRef) %>%
+  summarise(points = sum(points)) 
+fil = fil[fil$points > 10000,]
+  ggplot(data = fil, aes(x=driverId, y = points, label = driverRef)) + geom_point() + geom_label()
+```
+
+
+Not a very good visual, we can better compare the drivers points with a bar/histogram style
+```{r top driver hist}
+  ggplot(data = fil, aes(x=reorder(driverRef, points), y=points, fill=points)) + geom_bar(stat="sum") + ggtitle("Top drivers by points") + 
+  xlab("Driver Name") + ylab("Points") + 
+  scale_x_discrete(labels = function(labels) {
+    fixedLabels <- c()
+    for(n in 1:length(labels)) {
+      fixedLabels[n] <- paste0(ifelse(n %% 2 ==0, "" ,"\n"), labels[n])
+    }
+    return(fixedLabels)
+  })
+```
+
+```{r driverId_vector, include=FALSE}
+driverId_vec = c('webber', 'massa', 'button', 'michael_schumacher', 'raikkonen', 'rosberg', 'alonso', ' vettel', 'hamilton')
+```
+
+
+Are all of these drivers still alive and competing?
+
+
+
+
+# Races
+
 
 ```{r races}
 summary(races)
 ```
+Let's do some EDA on the circuits. Take a look at which races have the shortest lap time.
+```{r race-laptimes}
+driver_laps <- merge(races, lapTimes, by = "raceId")
+head(driver_laps)
+# Only looking at last 10 years
+driver_laps <- driver_laps[driver_laps$year > 2008,]
+#Add driver name to set
+driver_laps <- merge(driver_laps, drivers[,1:2], by = "driverId")
+length(unique(driver_laps$circuitId))
+length(unique(driver_laps$raceId))
+
+
+temp = driver_laps %>% 
+  group_by(driverRef, circuitId, raceId, name)
+
+prix_list = races[races$year > 2015,]
+prix_list = unique(prix_list$name)
+
+temp = temp[as.character(temp$name) %in% prix_list,]
+unique(temp$circuitId)
+
+for(i in 1:length(prix_list)){
+set = temp %>%
+  group_by(driverRef) %>%
+  filter(driverRef %in% driverId_vec) %>%
+  filter(name == prix_list[i]) %>%
+  summarise(avg = mean(milliseconds))
+  driverLapTimePlot = ggplot(data = set, aes(x= reorder(driverRef,avg), y = avg, fill = avg)) + geom_bar(stat="sum") + ggtitle(prix_list[i]) + scale_x_discrete(labels = function(labels){
+    fixedLabels = c()
+    for(n in 1:length(labels)){
+      fixedLabels[n] = paste0(ifelse(n %% 2 == 0, "", "\n"), labels[n])
+    }
+    return(fixedLabels)
+  }
+  )
+  print(driverLapTimePlot)
+}
+```
+
+
+
+
+# Results
 
 ```{r results}
 summary(results)
@@ -295,6 +408,10 @@ summary(results)
 ```{r driver s}
 summary(drivers)
 ```
+
+
+Let's create our `MASTER` set here, containing all info we can foresee as necessary going forward. 
+
 
 ## Including Plots
 
