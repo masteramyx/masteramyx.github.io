@@ -2,7 +2,10 @@
 title: "2020-04-05-formula-one"
 author: "Kyle Amyx"
 date: "5/1/2020"
+<<<<<<< HEAD
 tags: [R]
+=======
+>>>>>>> master
 classes: wide
 output:
   html_document:
@@ -11,6 +14,7 @@ output:
 
 
 
+<<<<<<< HEAD
 ## F1 Predictive Modeling
 
 I can't currently find the source of data but it is an extensive set made of multiple tables for years (1950-2017)
@@ -40,10 +44,28 @@ Data is broken down into multiple csv files which will need to be joined on comm
 * Driver Standings
 * Results
 * More used for reference
+=======
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+
+```r
+8*8
+```
+
+```
+## [1] 64
+```
+>>>>>>> master
 
 
 ```r
 circuits = read.csv("Data(1950_2017)/circuits.csv")
+<<<<<<< HEAD
 lapTimes = read.csv("Data(1950_2017)/lapTimes.csv", stringsAsFactors = FALSE)
 races = read.csv("Data(1950_2017)/races.csv", stringsAsFactors = FALSE)
 ```
@@ -51,11 +73,20 @@ races = read.csv("Data(1950_2017)/races.csv", stringsAsFactors = FALSE)
 ```
 ## Warning in scan(file = file, what = what, sep = sep, quote = quote, dec = dec, :
 ## embedded nul(s) found in input
+=======
+races = read.csv("Data(1950_2017)/races.csv")
+```
+
+```
+## Warning in scan(file = file, what = what, sep = sep, quote = quote, dec =
+## dec, : embedded nul(s) found in input
+>>>>>>> master
 ```
 
 ```r
 results = read.csv("Data(1950_2017)/results.csv")
 drivers = read.csv("Data(1950_2017)/drivers.csv")
+<<<<<<< HEAD
 driverStandings = read.csv("Data(1950_2017)/driverStandings.csv")
 ```
 
@@ -133,6 +164,51 @@ Are all of these drivers still alive and competing?
 # Races
 
 
+=======
+```
+
+
+
+```r
+summary(circuits)
+```
+
+```
+##    circuitId        circuitRef                             name
+##  Min.   : 1   adelaide   : 1   A1-Ring                       : 1
+##  1st Qu.:19   ain-diab   : 1   Adelaide Street Circuit       : 1
+##  Median :37   aintree    : 1   Ain Diab                      : 1
+##  Mean   :37   albert_park: 1   Aintree                       : 1
+##  3rd Qu.:55   americas   : 1   Albert Park Grand Prix Circuit: 1
+##  Max.   :73   anderstorp : 1   Aut\xcc_dromo do Estoril      : 1
+##               (Other)    :67   (Other)                       :67
+##        location     country        lat              lng
+##  Barcelona : 2   USA    :11   Min.   :-37.85   Min.   :-118.189
+##  California: 2   France : 7   1st Qu.: 33.58   1st Qu.:  -9.394
+##  Spielburg : 2   Spain  : 6   Median : 41.37   Median :   3.931
+##  Abu Dhabi : 1   UK     : 4   Mean   : 33.87   Mean   :   1.723
+##  Adelaide  : 1   Austria: 3   3rd Qu.: 47.22   3rd Qu.:  14.765
+##  Anderstorp: 1   Belgium: 3   Max.   : 57.27   Max.   : 144.968
+##  (Other)   :64   (Other):39
+##       alt
+##  Min.   :10
+##  1st Qu.:10
+##  Median :10
+##  Mean   :10
+##  3rd Qu.:10
+##  Max.   :10
+##  NA's   :72
+##                                                                   url
+##  http://en.wikipedia.org/wiki/A1-Ring                               : 1
+##  http://en.wikipedia.org/wiki/Adelaide_Street_Circuit               : 1
+##  http://en.wikipedia.org/wiki/Ain-Diab_Circuit                      : 1
+##  http://en.wikipedia.org/wiki/Aintree_Motor_Racing_Circuit          : 1
+##  http://en.wikipedia.org/wiki/Aut%C3%B3dromo_do_Estoril             : 1
+##  http://en.wikipedia.org/wiki/Aut%C3%B3dromo_Hermanos_Rodr%C3%ADguez: 1
+##  (Other)                                                            :67
+```
+
+>>>>>>> master
 
 ```r
 summary(races)
@@ -146,6 +222,7 @@ summary(races)
 ##  Mean   : 500   Mean   :1989   Mean   : 8.234   Mean   :21.76
 ##  3rd Qu.: 748   3rd Qu.:2005   3rd Qu.:12.000   3rd Qu.:30.00
 ##  Max.   :1009   Max.   :2018   Max.   :21.000   Max.   :73.00
+<<<<<<< HEAD
 ##      name               date               time               url
 ##  Length:997         Length:997         Length:997         Length:997
 ##  Class :character   Class :character   Class :character   Class :character
@@ -276,6 +353,27 @@ set = temp %>%
 
 # Results
 
+=======
+##
+##                  name             date           time
+##  British Grand Prix: 69   1950-05-13:  1           :731
+##  Italian Grand Prix: 69   1950-05-21:  1   12:00:00:118
+##  Monaco Grand Prix : 65   1950-05-30:  1   14:00:00: 28
+##  Belgian Grand Prix: 63   1950-06-04:  1   06:00:00: 20
+##  German Grand Prix : 63   1950-06-18:  1   13:00:00: 14
+##  French Grand Prix : 59   1950-07-02:  1   16:00:00: 12
+##  (Other)           :609   (Other)   :991   (Other) : 74
+##                                                    url
+##  http://en.wikipedia.org/wiki/1950_Belgian_Grand_Prix:  1
+##  http://en.wikipedia.org/wiki/1950_British_Grand_Prix:  1
+##  http://en.wikipedia.org/wiki/1950_French_Grand_Prix :  1
+##  http://en.wikipedia.org/wiki/1950_Indianapolis_500  :  1
+##  http://en.wikipedia.org/wiki/1950_Italian_Grand_Prix:  1
+##  http://en.wikipedia.org/wiki/1950_Monaco_Grand_Prix :  1
+##  (Other)                                             :991
+```
+
+>>>>>>> master
 
 ```r
 summary(results)
@@ -330,6 +428,7 @@ summary(drivers)
 ```
 
 ```
+<<<<<<< HEAD
 ##     driverId         driverRef       number           code        forename
 ##  Min.   :  1.0   abate    :  1   Min.   : 2.00          :757   John   : 14
 ##  1st Qu.:211.2   abecassis:  1   1st Qu.:10.25   BIA    :  2   Mike   : 14
@@ -346,6 +445,24 @@ summary(drivers)
 ##  Fittipaldi:  3   06/10/1918:  2   German   : 49
 ##  Hill      :  3   12/12/1946:  2   Brazilian: 31
 ##  (Other)   :821   (Other)   :830   (Other)  :271
+=======
+##     driverId         driverRef       number           code
+##  Min.   :  1.0   abate    :  1   Min.   : 2.00          :757
+##  1st Qu.:211.2   abecassis:  1   1st Qu.:10.25   BIA    :  2
+##  Median :421.5   acheson  :  1   Median :21.50   HAR    :  2
+##  Mean   :421.5   adamich  :  1   Mean   :30.50   MAG    :  2
+##  3rd Qu.:631.8   adams    :  1   3rd Qu.:38.25   VER    :  2
+##  Max.   :843.0   ader     :  1   Max.   :99.00   ALB    :  1
+##                  (Other)  :836   NA's   :804     (Other): 76
+##     forename         surname            dob         nationality
+##  John   : 14   Taylor    :  5   02/10/1921:  2   British  :162
+##  Mike   : 14   Wilson    :  4   04/09/1920:  2   American :157
+##  Peter  : 13   Brabham   :  3   05/05/1932:  2   Italian  : 99
+##  Bill   : 11   Brown     :  3   06/06/1923:  2   French   : 73
+##  Tony   : 11   Fittipaldi:  3   06/10/1918:  2   German   : 49
+##  Bob    : 10   Hill      :  3   12/12/1946:  2   Brazilian: 31
+##  (Other):769   (Other)   :821   (Other)   :830   (Other)  :271
+>>>>>>> master
 ##                                                           url
 ##                                                             :  1
 ##  http://en.wikipedia.org/wiki/%C3%89lie_Bayol               :  1
@@ -356,10 +473,13 @@ summary(drivers)
 ##  (Other)                                                    :836
 ```
 
+<<<<<<< HEAD
 
 Let's create our `MASTER` set here, containing all info we can foresee as necessary going forward.
 
 
+=======
+>>>>>>> master
 ## Including Plots
 
 You can also embed plots, for example:

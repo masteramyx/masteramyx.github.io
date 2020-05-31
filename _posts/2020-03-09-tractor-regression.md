@@ -1,6 +1,10 @@
 ---
   title: "Early Tractorization of Rural America"
   date: 2020-03-09
+<<<<<<< HEAD
+=======
+  tags: [EDA, regression]
+>>>>>>> master
   classes: wide
   header:
     image: "../assets/images/tractor/tractorHeaderImg4.jpg"
