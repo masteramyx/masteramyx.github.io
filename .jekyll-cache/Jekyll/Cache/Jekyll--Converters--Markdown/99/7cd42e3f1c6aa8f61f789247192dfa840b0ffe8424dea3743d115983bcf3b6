@@ -1,0 +1,451 @@
+I"��<h1 id="introduction">Introduction</h1>
+<p>Sentiment Analysis is the process of predicting whether a piece of information(usually text) indicates
+a positive, negative or neutral sentiment on a topic.</p>
+
+<p>This project allows the user to input a keyword and gathers tweets based on it, then analyzes the sentiments of those tweets.</p>
+
+<p>A classifier is <code class="highlighter-rouge">Supervised</code> if it is built on training corpuses containing the correct label for each input. The framework for supervised classification is described by the diagram shown below.</p>
+
+<p><img src="/assets/images/twitter/supervised_learning.png" alt="" /></p>
+
+<p>The work flow for this task will follow the shown framework. Taking our training set, a feature extractor converts each item into a feature set. These feature sets along with each input item’s label are put into our ML Algorithm to develop a model. During the prediction phase, the same feature extractor is used to convert the test set inputs into feture sets, these feature sets will have a label of <code class="highlighter-rouge">Null</code> or <code class="highlighter-rouge">None</code>. They are then put into the model which generates predicted labels to replace the <code class="highlighter-rouge">Null</code> or <code class="highlighter-rouge">None</code></p>
+
+<h1 id="getting-started">Getting Started</h1>
+<p>Let’s start with defining the packages required for fetching and reading/writing the data.</p>
+
+<p>The Python Twitter API Wrapper Docs can be found here…
+<a href="https://python-twitter.readthedocs.io/en/latest/twitter.html#twitter.api.Api.GetSearch">Python-Twitter Documentation</a></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">twitter</span>
+<span class="kn">from</span> <span class="nn">tqdm.notebook</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+</code></pre></div></div>
+
+<p>Next, we’ll define the packages required for the pre-processing of the data, as well as the classification.</p>
+
+<p>We will be using NLTK(Natural Language Toolkit) for the heavy lifting. The package comes with predefined <code class="highlighter-rouge">stopwords</code> and <code class="highlighter-rouge">punctuation</code>.</p>
+
+<p>Stop words are generally the most common words in a language, these along with punctuation do not assist predicting the sentiment and only take up valuable space. They are removed during pre-processing to reduce the computational load on the models.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">word_tokenize</span>
+<span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">punctuation</span>
+<span class="kn">from</span> <span class="nn">nltk.corpus</span> <span class="kn">import</span> <span class="n">stopwords</span>
+<span class="kn">import</span> <span class="nn">nltk</span>
+<span class="c1">#!{sys.executable} -m pip install pattern
+</span><span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s">'stopwords'</span><span class="p">)</span>
+<span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s">'punkt'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="connecting-to-twitter">Connecting to Twitter</h2>
+<p>The first step required is to connect to Twitter’s developer API. This is necessary to retrieve the data we would like to test our classifier on.</p>
+
+<p>You can start by applying for access at…
+<a href="!https://developer.twitter.com/en">Twitter Api</a></p>
+
+<p>Once you have API credentials we can verify by caling <code class="highlighter-rouge">VerifyCredentials()</code></p>
+
+<p>As we can see, all my twitter information is returned in JSON response which includes a <code class="highlighter-rouge">User</code> object, so we’re good to go.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+
+<span class="c1"># Fun Python Trick, just print the import object to see full file path, helps with
+# troubleshooting import issues.
+</span><span class="k">print</span><span class="p">(</span><span class="n">twitter</span><span class="p">)</span>
+<span class="c1"># init api instance
+</span><span class="n">twitter_api</span> <span class="o">=</span> <span class="n">twitter</span><span class="o">.</span><span class="n">Api</span><span class="p">(</span><span class="n">consumer_key</span><span class="o">=</span><span class="s">'CONSUMER_KEY'</span><span class="p">,</span>
+                         <span class="n">consumer_secret</span><span class="o">=</span><span class="s">'CONSUMER_SECRET'</span><span class="p">,</span>
+                         <span class="n">access_token_key</span><span class="o">=</span><span class="s">'ACCESS_TOKEN_KEY'</span><span class="p">,</span>
+                         <span class="n">access_token_secret</span><span class="o">=</span><span class="s">'ACCESS_TOKEN_SECRET'</span><span class="p">)</span>
+
+<span class="n">twitter_info</span> <span class="o">=</span> <span class="n">twitter_api</span><span class="o">.</span><span class="n">VerifyCredentials</span><span class="p">()</span>
+<span class="n">json_object</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">twitter_info</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_object</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;module 'twitter' from 'D:\\anaconda3\\lib\\site-packages\\twitter\\__init__.py'&gt;
+{
+  "created_at": "Mon Apr 16 03:05:50 +0000 2018",
+  "default_profile": true,
+  "description": "Ohio State Data Analytics | Android Dev",
+  "favourites_count": 22,
+  "followers_count": 12,
+  "friends_count": 57,
+  .
+  .
+  .
+  },
+  "statuses_count": 50
+}
+</code></pre></div></div>
+
+<p>Now that the API credentials have been verified, let’s write a function which will fetch tweets from Twitter based on a topic keyword.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">getTestSet</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">tweets</span> <span class="o">=</span> <span class="n">twitter_api</span><span class="o">.</span><span class="n">GetSearch</span><span class="p">(</span><span class="n">keyword</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="s">'en'</span><span class="p">)</span>
+
+        <span class="k">print</span><span class="p">(</span><span class="s">"Fetched "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tweets</span><span class="p">))</span> <span class="o">+</span> <span class="s">"tweets for the term "</span> <span class="o">+</span> <span class="n">keyword</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[{</span><span class="s">"text"</span><span class="p">:</span><span class="n">status</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s">"label"</span><span class="p">:</span> <span class="bp">None</span><span class="p">}</span> <span class="k">for</span> <span class="n">status</span> <span class="ow">in</span> <span class="n">tweets</span><span class="p">]</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"Error"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+</code></pre></div></div>
+
+<p>Download test set which is just all tweets returned for a topic from TwitterAPI</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">search_term</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"Enter word: "</span><span class="p">)</span>
+<span class="n">testDataSet</span> <span class="o">=</span> <span class="n">getTestSet</span><span class="p">(</span><span class="n">search_term</span><span class="p">)</span>
+<span class="c1">#print(testDataSet[0:4])
+</span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">testDataSet</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Enter word: blm
+Fetched 100tweets for the term blm
+{
+  "text": "Florida police have released footage of the mass looting of a Walmart during the BLM race riots. https://t.co/Gvv91hMzcR",
+  "label": null
+}
+{
+  "text": "Imagine if Fox News was as upset about the lockdown protests as they are about BLM protests \ud83e\udd14 https://t.co/2U6BmjXJya",
+  "label": null
+}
+{
+  "text": "A stroke of genius cancelling the BLM protest. It gave the far-right centre stage to reveal who they are without an\u2026 https://t.co/pHiyVPxrri",
+  "label": null
+}
+{
+  "text": "@markgoldbridge They're gonna play with BLM on their shirts whilst playing football with said vulnerable group.\ud83d\ude02",
+  "label": null
+}
+</code></pre></div></div>
+
+<p>NOTE: The original training dataset I chose was very skewed and contained ~4000 neutral classifications out of a dataset of 5000 points and only ~500 Positive and Negative. Therefore the model predicted EVERYTHING as neutral.</p>
+
+<p>Instead I found a much more balanced training set.
+http://help.sentiment140.com/for-students/</p>
+
+<p>The only adjustment’s needed to be made was converted the classification variable from a Integer(0,2,4) to a String(Negative, Neutral, Positive).</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">buildTwitterTraining</span><span class="p">():</span>
+    <span class="n">twitterTraining</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">'twitter_training.csv'</span><span class="p">,</span> <span class="s">'r'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">'cp1252'</span><span class="p">)</span> <span class="k">as</span> <span class="n">csvfile</span><span class="p">:</span>
+        <span class="n">so</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">csvfile</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s">','</span><span class="p">,</span> <span class="n">quotechar</span><span class="o">=</span><span class="s">"</span><span class="se">\"</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">so</span><span class="p">):</span>
+            <span class="n">labelNum</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="s">""</span>
+<span class="c1">#         print(labelNum)
+</span>            <span class="k">if</span><span class="p">(</span><span class="n">labelNum</span> <span class="o">==</span> <span class="s">'0'</span><span class="p">):</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="s">'negative'</span>
+<span class="c1">#             print('negative label')
+</span>            <span class="k">elif</span><span class="p">(</span><span class="n">labelNum</span> <span class="o">==</span> <span class="s">'2'</span><span class="p">):</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="s">'neutral'</span>
+<span class="c1">#             print('neutral label')
+</span>            <span class="k">else</span><span class="p">:</span>
+            <span class="c1">#labelNum == 4
+</span>                <span class="n">label</span> <span class="o">=</span> <span class="s">'positive'</span>
+<span class="c1">#             print('positive label')
+</span>
+            <span class="n">twitterTraining</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">"tweet_id"</span><span class="p">:</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s">"text"</span><span class="p">:</span><span class="n">row</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="s">"label"</span><span class="p">:</span><span class="n">label</span><span class="p">})</span>
+</code></pre></div></div>
+
+<p>PrettyPrint first 10 tweets of training set to give us a preview.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># buildTwitterTraining()
+#Unpickle the trainingData
+</span><span class="n">inFile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">'twitterTraining'</span><span class="p">,</span> <span class="s">'rb'</span><span class="p">)</span>
+<span class="n">twitterTraining</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">inFile</span><span class="p">)</span>
+<span class="n">inFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">twitterTraining</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">],</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[
+  {
+    "tweet_id": "1467810369",
+    "text": "@switchfoot http://twitpic.com/2y1zl - Awww, that's a bummer.  You shoulda got David Carr of Third Day to do it. ;D",
+    "label": "negative"
+  },
+  {
+    "tweet_id": "1467810672",
+    "text": "is upset that he can't update his Facebook by texting it... and might cry as a result  School today also. Blah!",
+    "label": "negative"
+  },
+  {
+    "tweet_id": "1467810917",
+    "text": "@Kenichan I dived many times for the ball. Managed to save 50%  The rest go out of bounds",
+    "label": "negative"
+  },
+  {
+    "tweet_id": "1467811184",
+    "text": "my whole body feels itchy and like its on fire ",
+    "label": "negative"
+  },
+  {
+    "tweet_id": "1467811193",
+    "text": "@nationwideclass no, it's not behaving at all. i'm mad. why am i here? because I can't see you all over there. ",
+    "label": "negative"
+  },
+  {
+    "tweet_id": "1467811372",
+    "text": "@Kwesidei not the whole crew ",
+    "label": "negative"
+  },
+  {
+    "tweet_id": "1467811592",
+    "text": "Need a hug ",
+    "label": "negative"
+  },
+  {
+    "tweet_id": "1467811594",
+    "text": "@LOLTrish hey  long time no see! Yes.. Rains a bit ,only a bit  LOL , I'm fine thanks , how's you ?",
+    "label": "negative"
+  },
+  {
+    "tweet_id": "1467811795",
+    "text": "@Tatiana_K nope they didn't have it ",
+    "label": "negative"
+  },
+  {
+    "tweet_id": "1467812025",
+    "text": "@twittera que me muera ? ",
+    "label": "negative"
+  }
+]
+</code></pre></div></div>
+
+<p>Due to API rate limits, fetching all 5000 tweets takes several hours..</p>
+
+<p>The next step is pre-processing of the tweets…</p>
+
+<p>This is a question of what matters and what doesn’t matter in Sentiment Analysis..</p>
+
+<p>The process of converting data to something a computer can understand is referred to as pre-processing. One of the major forms of pre-processing is to filter out useless data. In natural language processing, useless words (data), are referred to as stop words.</p>
+
+<p>Using NLTK, we can look at the pre-defined english stop words</p>
+
+<p>Tokenization is the act of breaking up a sequence of strings into pieces such as words, keywords, phrases, symbols and other elements called tokens. … Tokenization is used in computer science, where it plays a large part in the process of lexical analysis.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">PreProcessTweets</span><span class="p">:</span>
+    <span class="c1">#Constructor
+</span>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#Create list of pre-defined stoiterablepwords + extras
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">_stopwords</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">stopwords</span><span class="o">.</span><span class="n">words</span><span class="p">(</span><span class="s">'english'</span><span class="p">)</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">punctuation</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="s">'AT_USER'</span><span class="p">,</span><span class="s">'URL'</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">processTweets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_of_tweets</span><span class="p">):</span>
+        <span class="n">processedTweets</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">tweet</span> <span class="ow">in</span> <span class="n">list_of_tweets</span><span class="p">:</span>
+            <span class="n">processedTweets</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_processTweet</span><span class="p">(</span><span class="n">tweet</span><span class="p">[</span><span class="s">"text"</span><span class="p">]),</span> <span class="n">tweet</span><span class="p">[</span><span class="s">"label"</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">processedTweets</span>
+
+    <span class="c1"># Process Tweet -&gt; remove all information except the tweet text(lowercased, all punctuation removed)
+</span>    <span class="k">def</span> <span class="nf">_processTweet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tweet</span><span class="p">):</span>
+        <span class="c1">#Convert all letters -&gt; lowercase
+</span>        <span class="n">tweet</span> <span class="o">=</span> <span class="n">tweet</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="c1"># remove URL's
+</span>        <span class="n">tweet</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">'((www</span><span class="err">\</span><span class="s">.[^</span><span class="err">\</span><span class="s">s]+)|(https?://[^</span><span class="err">\</span><span class="s">s]+))'</span><span class="p">,</span> <span class="s">'URL'</span><span class="p">,</span> <span class="n">tweet</span><span class="p">)</span>
+        <span class="c1">#remove usernames
+</span>        <span class="n">tweet</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">'@[^</span><span class="err">\</span><span class="s">s]+'</span><span class="p">,</span> <span class="s">'AT_USER'</span><span class="p">,</span> <span class="n">tweet</span><span class="p">)</span>
+        <span class="c1">#tweet = nltk.casual.remove_handles(tweet)
+</span>        <span class="c1">#remove hash from hashtag
+</span>        <span class="n">tweet</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">r'#([^\s]+)'</span><span class="p">,</span> <span class="s">r'\1'</span><span class="p">,</span> <span class="n">tweet</span><span class="p">)</span>
+        <span class="c1"># tokenize words and remove repeated characters (helloooooo -&gt; hello)
+</span>        <span class="n">tweet</span> <span class="o">=</span> <span class="n">word_tokenize</span><span class="p">(</span><span class="n">tweet</span><span class="p">)</span>
+        <span class="n">word_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">tweet</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">word</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stopwords</span><span class="p">):</span>
+                <span class="n">word_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">word_list</span>
+
+</code></pre></div></div>
+
+<p>List of pre-defined stop words from NLTK package.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">stopwords</span><span class="o">.</span><span class="n">words</span><span class="p">(</span><span class="s">'english'</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', "you're", "you've", "you'll", "you'd", 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', "she's", 'her', 'hers', 'herself', 'it', "it's", 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', "that'll", 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', "don't", 'should', "should've", 'now', 'd', 'll', 'm', 'o', 're', 've', 'y', 'ain', 'aren', "aren't", 'couldn', "couldn't", 'didn', "didn't", 'doesn', "doesn't", 'hadn', "hadn't", 'hasn', "hasn't", 'haven', "haven't", 'isn', "isn't", 'ma', 'mightn', "mightn't", 'mustn', "mustn't", 'needn', "needn't", 'shan', "shan't", 'shouldn', "shouldn't", 'wasn', "wasn't", 'weren', "weren't", 'won', "won't", 'wouldn', "wouldn't"]
+</code></pre></div></div>
+
+<p>Now to do the actual preprocessing. We create our PreProcessTweets() class and pass in our trainingSet to the <code class="highlighter-rouge">processTweets()</code> function. This returns a now processed training set which as discussed above will have stopwords,punctuation, usernames, url’s, etc. removed. Esentailly everything that won’t assist in the sentiment classification.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">tweetProcesser</span> <span class="o">=</span> <span class="n">PreProcessTweets</span><span class="p">()</span>
+<span class="c1"># preprocessedTrainingSet = tweetProcesser.processTweets(twitterTraining)
+</span><span class="n">newTraining</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">newTraining</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">twitterTraining</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10000</span><span class="p">])</span>
+<span class="n">newTraining</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">twitterTraining</span><span class="p">[</span><span class="mi">1590000</span><span class="p">:</span><span class="mi">1600000</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">newTraining</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">preprocessedTrainingSet</span> <span class="o">=</span> <span class="n">tweetProcesser</span><span class="o">.</span><span class="n">processTweets</span><span class="p">(</span><span class="n">newTraining</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">preprocessedTrainingSet</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">preprocessedTrainingSet</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">preprocessedTrainingSet</span><span class="p">[</span><span class="mi">9990</span><span class="p">:</span><span class="mi">10000</span><span class="p">])</span>
+<span class="c1"># Each item in list is represented by [(list of tokenized words in tweet, sentiment)]
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'tweet_id': '1467810369', 'text': "@switchfoot http://twitpic.com/2y1zl - Awww, that's a bummer.  You shoulda got David Carr of Third Day to do it. ;D", 'label': 'negative'}
+20000
+[(['awww', "'s", 'bummer', 'shoulda', 'got', 'david', 'carr', 'third', 'day'], 'negative'), (['upset', 'ca', "n't", 'update', 'facebook', 'texting', '...', 'might', 'cry', 'result', 'school', 'today', 'also', 'blah'], 'negative'), (['dived', 'many', 'times', 'ball', 'managed', 'save', '50', 'rest', 'go', 'bounds'], 'negative'), (['whole', 'body', 'feels', 'itchy', 'like', 'fire'], 'negative'), (["'s", 'behaving', "'m", 'mad', 'ca', "n't", 'see'], 'negative'), (['whole', 'crew'], 'negative'), (['need', 'hug'], 'negative'), (['hey', 'long', 'time', 'see', 'yes..', 'rains', 'bit', 'bit', 'lol', "'m", 'fine', 'thanks', "'s"], 'negative'), (['nope', "n't"], 'negative'), (['que', 'muera'], 'negative')]
+
+
+[(['wish', 'looks', 'like', 'fun'], 'negative'), (['howwww', 'read', 'thingsss', 'ahhh', 'new'], 'negative'), (['still', 'tooth', 'ache'], 'negative'), (['georgous', 'day', 'pittsburgh', 'going', 'run', 'spending', 'day', 'studying'], 'negative'), (['cant', 'people', 'get', 'head', 'ive', 'changed', 'name', 'castiel', 'windsor', 'even', 'worse', 'ca', "n't", 'even', 'spell', 'half', 'time'], 'negative'), (['aww', "'s", 'sad'], 'negative'), (['stupid', 'dvds', 'stuffing', 'good', 'bits', 'jaws'], 'negative'), (['close', 'friends', 'family', "'m", 'afraid', "'m", 'work', 'colleague'], 'negative'), (['crap', 'looking', 'last', 'tweeted', '...', 'early', "'s", '10', "n't", 'like', '...', '12'], 'negative'), (['another', 'rainboot', 'day'], 'negative')]
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Pickle the OG training set, it is no longer needed since we've done the pre-processing
+# twitterTrainingOutFile = open('twitterTraining', 'wb')
+# pickle.dump(twitterTraining, twitterTrainingOutFile)
+# twitterTrainingOutFile.close()
+</span></code></pre></div></div>
+
+<p>Each item in list is represented by [(list of tokenized words in tweet, sentiment)]
+As shown below</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># del twitterTraining
+# print(len(twitterTraining))
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Frist Preprocessed Training Tweet: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">preprocessedTrainingSet</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Last Preprocessed Training Tweet: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">preprocessedTrainingSet</span><span class="p">[</span><span class="mi">19999</span><span class="p">]))</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Preprocessed Training Tweet: (['awww', "'s", 'bummer', 'shoulda', 'got', 'david', 'carr', 'third', 'day'], 'negative')
+Preprocessed Training Tweet: (['happy', 'charitytuesday'], 'positive')
+</code></pre></div></div>
+
+<p>Now the same preprocessing to our test set.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">preprocessedTestSet</span> <span class="o">=</span> <span class="n">tweetProcesser</span><span class="o">.</span><span class="n">processTweets</span><span class="p">(</span><span class="n">testDataSet</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Build a dictionary…</p>
+
+<p>Compare every word in the training set against each tweet we have, creating a new binary feature which represents wether the word in our vocabulary is resident in the tweet or not</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">buildVocabulary</span><span class="p">(</span><span class="n">processedTrainingSet</span><span class="p">):</span>
+    <span class="n">all_words</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="n">sentiment</span><span class="p">)</span> <span class="ow">in</span> <span class="n">processedTrainingSet</span><span class="p">:</span>
+        <span class="n">all_words</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+
+    <span class="c1"># Distribution of the words in all_words
+</span>    <span class="n">wordlist</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">FreqDist</span><span class="p">(</span><span class="n">all_words</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">wordlist</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">15</span><span class="p">))</span>
+    <span class="c1"># take top 3,000 most common words
+</span>    <span class="n">word_features</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">wordlist</span><span class="o">.</span><span class="n">keys</span><span class="p">())[:</span><span class="mi">3000</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">word_features</span>
+
+
+<span class="k">def</span> <span class="nf">extract_features</span><span class="p">(</span><span class="n">tweet</span><span class="p">):</span>
+    <span class="n">tweet_words</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">tweet</span><span class="p">)</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">word_features</span><span class="p">:</span>
+        <span class="n">features</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span> <span class="ow">in</span> <span class="n">tweet_words</span><span class="p">)</span>
+        <span class="c1">#features['contains(%s)' % word] = (word in tweet_words)
+</span>    <span class="k">return</span> <span class="n">features</span>
+</code></pre></div></div>
+
+<p>So now we have a dictionary called <code class="highlighter-rouge">word_features</code> this contains every word in the training set and the count of its occurences, for example “(<code class="highlighter-rouge">cat</code>, 700)”, this says the word CAT has appeared in our dataset 700 times.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#Build word features set
+</span><span class="n">word_features</span> <span class="o">=</span> <span class="n">buildVocabulary</span><span class="p">(</span><span class="n">preprocessedTrainingSet</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[('...', 3583), ("'s", 2345), ("n't", 2240), ("'m", 1640), ('good', 1227), ('day', 1177), ('get', 1090), ('work', 1084), ('today', 1015), ('quot', 970), ('go', 922), ('like', 890), ('got', 848), ('going', 805), ('love', 746)]
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">featuresets</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">classify</span><span class="o">.</span><span class="n">apply_features</span><span class="p">(</span><span class="n">extract_features</span><span class="p">,</span> <span class="n">preprocessedTrainingSet</span><span class="p">)</span>
+<span class="c1">#featuresets = [(extract_features(tweet), sentiment) for (tweet, sentiment) in preprocessedTrainingSet]
+</span></code></pre></div></div>
+
+<p>Now we’ve built whats called a feature set. Each item in this feature set or vector represents a tweet from the training set. Each vector item contains every word in the entire training set paired with a boolean which represents wether that word is present in the tweet, along with the pre-defined sentiment. The structure is displayed below.</p>
+
+<p>[ listOf(every word in training set : true/false(present in tweet)),    pre-defined sentiment(positive/negative) ]</p>
+
+<p>Now to train the bayes classifier on the training features we’ve just created</p>
+
+<p>The most important and the shortest part of this project, training the classifier. NLTK makes this easy with a simple function. Since our training set contained 160,000 tweets, this may take quite a bit of time to train. I personally went to work out and get some coffee so I’m sure on the exact amount of time.</p>
+
+<p>It would be interesting however if there is a python package that allows some kind of wrapper around functions which counts the time until completion.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">NBayesClassifier</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">NaiveBayesClassifier</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">featuresets</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">NBayesClassifier</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">featuresets</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;nltk.classify.naivebayes.NaiveBayesClassifier object at 0x000002DBA5EDA2C8&gt;
+20000
+</code></pre></div></div>
+
+<p>NOTE:</p>
+
+<p>I’ve ran into a problem with running the classifier on my feature set which contains 160,000 individual items. I’ve encoutered a <code class="highlighter-rouge">Memory Error</code>, python tries to load the whole dataset into memory and we run out of space. Currently we have 2 options in front of us:</p>
+
+<p>1.) Take a reasonable sized subset of the <code class="highlighter-rouge">FeatureSet</code> and run the accuracy function on this set, this will give you a good idea of the properties of the full size set</p>
+
+<p>2.) Batch Processing: I’m not knowledgable enough with python to accomplish this right now, so I’ll stick to option one and make the subset a size of 10,000</p>
+
+<p>Below I shuffle the feature list and pull out a subset of 10,000</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="s">"Classifier accuracy percent:"</span><span class="p">,(</span><span class="n">nltk</span><span class="o">.</span><span class="n">classify</span><span class="o">.</span><span class="n">accuracy</span><span class="p">(</span><span class="n">NBayesClassifier</span><span class="p">,</span> <span class="n">featuresets</span><span class="p">))</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">NBayesClassifier</span><span class="o">.</span><span class="n">show_most_informative_features</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Classifier accuracy percent: 77.27000000000001
+Most Informative Features
+                  throat = True           negati : positi =     39.7 : 1.0
+                headache = True           negati : positi =     38.3 : 1.0
+                  easter = True           negati : positi =     32.3 : 1.0
+                    snow = True           negati : positi =     27.9 : 1.0
+                    died = True           negati : positi =     24.3 : 1.0
+                  spring = True           negati : positi =     20.6 : 1.0
+           unfortunately = True           negati : positi =     19.0 : 1.0
+                    argh = True           negati : positi =     18.3 : 1.0
+                   lines = True           positi : negati =     15.0 : 1.0
+                    loss = True           negati : positi =     14.3 : 1.0
+                      22 = True           negati : positi =     13.7 : 1.0
+                   hates = True           negati : positi =     13.4 : 1.0
+                    dang = True           negati : positi =     13.0 : 1.0
+                   hurts = True           negati : positi =     12.4 : 1.0
+                  tweeps = True           positi : negati =     12.3 : 1.0
+</code></pre></div></div>
+
+<p>The <code class="highlighter-rouge">show_most_informative_features()</code> function is very useful. From the output we can see that for example</p>
+
+<p><code class="highlighter-rouge">throat</code> appears in a negative tweet almost 40x more than in a positive.</p>
+
+<p>Now we are creating a vector of predicted sentiments for each tweet in the test set.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># classifing on the extracted feature vector for all the tweets in test set, which already have the sentiment labeled as NULL
+</span><span class="n">NBResultLabels</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">tweet</span> <span class="ow">in</span> <span class="n">preprocessedTestSet</span><span class="p">:</span>
+    <span class="n">NBResultLabels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">NBayesClassifier</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">extract_features</span><span class="p">(</span><span class="n">tweet</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># MAJORITY RULE
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Positive Labels: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">NBResultLabels</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">'positive'</span><span class="p">)))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Negative Labels: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">NBResultLabels</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">'negative'</span><span class="p">)))</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">NBResultLabels</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">'positive'</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">NBResultLabels</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">'negative'</span><span class="p">)):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"POSITIVE"</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"POSITIVE PERCENTAGE = "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="n">NBResultLabels</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">'positive'</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">NBResultLabels</span><span class="p">))</span> <span class="o">+</span> <span class="s">"</span><span class="si">%</span><span class="s">"</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"NEGATIVE"</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"NEGATIVE PERCENTAGE = "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="n">NBResultLabels</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">'negative'</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">NBResultLabels</span><span class="p">))</span> <span class="o">+</span> <span class="s">"</span><span class="si">%</span><span class="s">"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Positive Labels: 79
+Negative Labels: 21
+POSITIVE
+POSITIVE PERCENTAGE = 79.0%
+</code></pre></div></div>
+
+<p>The keyword parameter I used was <code class="highlighter-rouge">blm</code> which stands for <code class="highlighter-rouge">Black lives matter</code>, a pretty important topic at the time of this writing. It’s nice to see that ~80 of the 100 tweets we fetched from the API have been classified as positive.</p>
+:ET
