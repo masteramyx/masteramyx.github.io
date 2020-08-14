@@ -1,5 +1,5 @@
 ---
-  layout: category
+  layout: archive
   title: "Mobile Projects"
   permalink: /android/
   author_profile: true
