@@ -13,4 +13,9 @@ var store = [{
         "excerpt":"Introduction Sentiment Analysis is the process of predicting whether a piece of information(usually text) indicates a positive, negative or neutral sentiment on a topic. This project allows the user to input a keyword and gathers tweets based on it, then analyzes the sentiments of those tweets. A classifier is Supervised...","categories": [],
         "tags": ["Python"],
         "url": "http://localhost:4000/twitter/",
+        "teaser":null},{
+        "title": "Twitter Mobile",
+        "excerpt":"Introduction  Mobile reproduction of the Twitter Sentiment Analysis project   Application Architecture   Using Tensorflow Lite pre-trained model  ","categories": [],
+        "tags": [],
+        "url": "http://localhost:4000/twitter-mobile/",
         "teaser":null}]
