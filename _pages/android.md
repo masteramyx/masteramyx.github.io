@@ -4,7 +4,7 @@
   permalink: /android/
   author_profile: true
   header:
-    image: "/assets/images/ioPhoto.jpg"
+    image: "/assets/images/cbus_night.jpg"
 ---
 
 {% include group-by-array collection=site.posts field="tags-mobile" %}

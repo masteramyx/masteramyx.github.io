@@ -8,9 +8,11 @@ excerpt: "Data Science"
 classes: wide
 ---
 # Introduction
-Sentiment Analysis is the process of predicting whether a piece of information(usually text) indicates
-a positive, negative or neutral sentiment on a topic.
+Mobile reproduction of the `Twitter Sentiment Analysis` project
 
-This project allows the user to input a keyword and gathers tweets based on it, then analyzes the sentiments of those tweets.
 
-A classifier is `Supervised` if it is built on training corpuses containing the correct label for each input. The framework for supervised classification is described by the diagram shown below.
+# Application Architecture
+
+
+
+# Using Tensorflow Lite pre-trained model

@@ -13,6 +13,8 @@
 <meta name="description" content="Data Science ">
 
 
+  <meta name="author" content="Kyle Amyx">
+
 
 <meta property="og:type" content="article">
 <meta property="og:locale" content="en_US">
@@ -185,11 +187,24 @@
 <div itemscope itemtype="https://schema.org/Person">
 
   
+    <div class="author__avatar">
+      
+
+      
+        <img src="/assets/images/bio_image.jpg" alt="Kyle Amyx" itemprop="image">
+      
+    </div>
+  
 
   <div class="author__content">
     
-      <h3 class="author__name" itemprop="name"></h3>
+      <h3 class="author__name" itemprop="name">Kyle Amyx</h3>
     
+    
+      <div class="author__bio" itemprop="description">
+        <p>Data Science Portfolio</p>
+
+      </div>
     
   </div>
 
@@ -197,7 +212,31 @@
     <button class="btn btn--inverse">Follow</button>
     <ul class="author__urls social-icons">
       
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Columbus, OH</span>
+        </li>
+      
 
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <li><a href="https://github.com/masteramyx" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+          
+        
+          
+        
+          
+            <li><a href="https://www.linkedin.com/in/kyle-amyx-0865aa91/" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> LinkedIn</a></li>
+          
+        
       
 
       
@@ -280,7 +319,7 @@
 
 
 
-  13 minute read
+  14 minute read
 
 </p>
           
@@ -559,9 +598,11 @@ One of the major forms of pre-processing is to filter out useless data. In NLP, 
 This returns a now processed training set which as discussed above will have stopwords,punctuation, usernames, url’s, etc. removed.</p>
 
 <p>NOTE:<br />
-My <code class="highlighter-rouge">twitterTraining</code> set has 1,600,000 observations. As per NLTK documentation, this package does not handle large datasets well. <br />
-<img src="/assets/images/twitter/nltk_large_data.JPG" alt="" />
-So, while it would be nice to have all those items contribute to the training, the package just won’t handle it. I’ve reduced the size to 20,000.</p>
+My <code class="highlighter-rouge">twitterTraining</code> set has 1,600,000 observations. As per NLTK documentation, this package does not handle large datasets well. <br /></p>
+
+<p><img src="/assets/images/twitter/nltk_large_data.JPG" alt="" /></p>
+
+<p>So, while it would be nice to have all those items contribute to the training, the package just won’t handle it. I’ve reduced the size to 20,000.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">tweetProcesser</span> <span class="o">=</span> <span class="n">PreProcessTweets</span><span class="p">()</span>
 <span class="c1"># preprocessedTrainingSet = tweetProcesser.processTweets(twitterTraining)
@@ -580,16 +621,21 @@ So, while it would be nice to have all those items contribute to the training, t
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>15000
 5000
+</code></pre></div></div>
 
-Each observation is represented as below
-[(['awww', "'s", 'bummer', 'shoulda', 'got', 'david', 'carr', 'third', 'day'], 'negative'), (['upset', 'ca', "n't", 'update', 'facebook', 'texting', '...', 'might', 'cry', 'result', 'school', 'today', 'also', 'blah'], 'negative')]
-The tweet is has been processed and tokenized and so the object contains the processed tweet along with the attached label.
+<p>Each observation is represented as below</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(['awww', "'s", 'bummer', 'shoulda', 'got', 'david', 'carr', 'third', 'day'], 'negative')
+
+  - The tweet is has been processed and tokenized and so the object contains the tokenized tweet along with the attached label.
 </code></pre></div></div>
 
 <p>An important step taken above can be visualzed as so…
 <img src="/assets/images/twitter/corpus.png" alt="" /></p>
 
-<p>We’ve taken our development set <code class="highlighter-rouge">TwitterTraining</code>(subsetted into <code class="highlighter-rouge">NewTraining</code>(size 20,000)) and split that out into our Training Set(<code class="highlighter-rouge">train_set_pre</code>) and our Development Test Set(<code class="highlighter-rouge">dev_test_set_pre</code>). Each of these sets are passed through the preprocessing flow. <br /> In the next section the training set will be used to train the classifier and then run that classifier on the Development Test set to gain the accuracy and also to generate a list of errors the classifier makes in prediction, which can then be used in <code class="highlighter-rouge">error analysis.</code></p>
+<p>We’ve taken our development set <code class="highlighter-rouge">TwitterTraining</code>(subsetted into <code class="highlighter-rouge">NewTraining</code>(size 20,000)) and split that out into our Training Set(<code class="highlighter-rouge">train_set_pre</code>) and our Development Test Set(<code class="highlighter-rouge">dev_test_set_pre</code>). Each of these sets are passed through the preprocessing flow. <br />
+<br />
+In the next section the training set will be used to train the classifier and then run that classifier on the Development Test set to gain the accuracy and also to generate a list of errors the classifier makes in prediction, which can then be used in <code class="highlighter-rouge">error analysis</code> if desired.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="s">"First Preprocessed Training Tweet: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">preprocessedTrainingSet</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 <span class="k">print</span><span class="p">(</span><span class="s">"Last Preprocessed Training Tweet: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">preprocessedTrainingSet</span><span class="p">[</span><span class="mi">19999</span><span class="p">]))</span>
@@ -604,7 +650,7 @@ Last Preprocessed Training Tweet: (['happy', 'charitytuesday'], 'positive')
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">preprocessedTestSet</span> <span class="o">=</span> <span class="n">tweetProcesser</span><span class="o">.</span><span class="n">processTweets</span><span class="p">(</span><span class="n">testDataSet</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p>Build a dictionary…</p>
+<h2 id="build-a-dictionary">Build a dictionary…</h2>
 
 <p>Compare every word in the training set against each tweet we have, creating a new binary feature which represents wether the word in our vocabulary is resident in the tweet or not</p>
 
@@ -632,7 +678,7 @@ Last Preprocessed Training Tweet: (['happy', 'charitytuesday'], 'positive')
 </span>    <span class="k">return</span> <span class="n">features</span>
 </code></pre></div></div>
 
-<p>So now we have a dictionary called <code class="highlighter-rouge">word_features</code> this contains every word in the training set and the count of its occurences, for example “(<code class="highlighter-rouge">cat</code>, 700)”, this says the word CAT has appeared in our dataset 700 times.</p>
+<p>So now we have a dictionary called <code class="highlighter-rouge">word_features</code> this contains every word in the training set and the count of its occurences, for example <code class="highlighter-rouge">(cat, 700)</code>, this says the word CAT has appeared in our training set 700 times.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#Build word features set
 </span><span class="n">word_features</span> <span class="o">=</span> <span class="n">buildVocabulary</span><span class="p">(</span><span class="n">preprocessedTrainingSet</span><span class="p">)</span>
@@ -642,18 +688,20 @@ Last Preprocessed Training Tweet: (['happy', 'charitytuesday'], 'positive')
 </code></pre></div></div>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">featuresets</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">classify</span><span class="o">.</span><span class="n">apply_features</span><span class="p">(</span><span class="n">extract_features</span><span class="p">,</span> <span class="n">preprocessedTrainingSet</span><span class="p">)</span>
+<span class="n">featuresets_dev_test</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">classify</span><span class="o">.</span><span class="n">apply_features</span><span class="p">(</span><span class="n">extract_features</span><span class="p">,</span> <span class="n">preprocessedDevTestSet</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p>Now we’ve built whats called a feature set. Each item in this feature set or vector represents a tweet from the training set. Each vector item contains every word in the entire training set paired with a boolean which represents wether that word is present in the tweet, along with the pre-defined sentiment. The structure is displayed below.</p>
+<p>The 2 lines above build whats called a feature set. Each item in this feature set or vector represents a tweet from the training set. <br />
+Each vector item contains every word in the entire training set paired with a boolean which represents wether that word is present in the tweet, along with the pre-defined sentiment. The structure is displayed below.</p>
 
-<p>[ listOf(every word in training set : true/false(present in tweet)),    pre-defined sentiment(positive/negative) ]</p>
+<p><code class="highlighter-rouge">[ listOf(every word in training set : true/false(present in tweet)),    pre-defined sentiment(positive/negative) ]</code></p>
 
 <h2 id="classification-and-analysis">Classification and Analysis</h2>
 <p>Now to train the bayes classifier on the training features we’ve just created</p>
 
-<p>The most important and the shortest part of this project, training the classifier. NLTK makes this easy with a simple function. Since our training set contained 160,000 tweets, this may take quite a bit of time to train. I personally went to work out and get some coffee so I’m sure on the exact amount of time.</p>
+<p>The most important and the shortest part of this project, training the classifier. NLTK makes this easy with a simple function. Since our training set contained 160,000 tweets, this may take quite a bit of time to train. I personally went to work out and get some coffee so I’m not sure on the exact amount of time.</p>
 
-<p>It would be interesting however if there is a python package that allows some kind of wrapper around functions which counts the time until completion.</p>
+<p>It would be interesting however to find a python package that allows some kind of wrapper around functions which counts the time until completion.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">NBayesClassifier</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">NaiveBayesClassifier</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">featuresets</span><span class="p">)</span>
 </code></pre></div></div>
@@ -663,20 +711,12 @@ Last Preprocessed Training Tweet: (['happy', 'charitytuesday'], 'positive')
 </code></pre></div></div>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;nltk.classify.naivebayes.NaiveBayesClassifier object at 0x000002DBA5EDA2C8&gt;
-20000
+15000
 </code></pre></div></div>
 
-<p>NOTE:</p>
+<p>Above we print the Classifier Object just to confirm it has been created and is in Memory, next we look at the length of our feature set. 15,000..the size of our Development Training Set</p>
 
-<p>I’ve ran into a problem with running the classifier on my feature set which contains 160,000 individual items. I’ve encoutered a <code class="highlighter-rouge">Memory Error</code>, python tries to load the whole dataset into memory and we run out of space. Currently we have 2 options in front of us:</p>
-
-<p>1.) Take a reasonable sized subset of the <code class="highlighter-rouge">FeatureSet</code> and run the accuracy function on this set, this will give you a good idea of the properties of the full size set</p>
-
-<p>2.) Batch Processing: I’m not knowledgable enough with python to accomplish this right now, so I’ll stick to option one and make the subset a size of 10,000</p>
-
-<p>Below I shuffle the feature list and pull out a subset of 10,000</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="s">"Classifier accuracy percent:"</span><span class="p">,(</span><span class="n">nltk</span><span class="o">.</span><span class="n">classify</span><span class="o">.</span><span class="n">accuracy</span><span class="p">(</span><span class="n">NBayesClassifier</span><span class="p">,</span> <span class="n">featuresets</span><span class="p">))</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="s">"Classifier accuracy percent:"</span><span class="p">,(</span><span class="n">nltk</span><span class="o">.</span><span class="n">classify</span><span class="o">.</span><span class="n">accuracy</span><span class="p">(</span><span class="n">NBayesClassifier</span><span class="p">,</span> <span class="n">featuresets_dev_test</span><span class="p">))</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span>
 <span class="n">NBayesClassifier</span><span class="o">.</span><span class="n">show_most_informative_features</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
 </code></pre></div></div>
 
@@ -699,9 +739,66 @@ Most Informative Features
                   tweeps = True           positi : negati =     12.3 : 1.0
 </code></pre></div></div>
 
+<p>Here we are gaining some metric on our classifier, testing the accuracy. As you can see, currently it’s at ~77%.</p>
+
 <p>The <code class="highlighter-rouge">show_most_informative_features()</code> function is very useful. From the output we can see that for example</p>
 
 <p><code class="highlighter-rouge">throat</code> appears in a negative tweet almost 40x more than in a positive.</p>
+
+<h2 id="examine-errors">Examine Errors</h2>
+
+<p>Since of course the classifier will not have 100% accuracy, we now have the chance to examine the individual error cases where the classifier predicted the wrong label. <br /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#Examine Errors
+</span>
+<span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<span class="k">for</span> <span class="n">dict_item</span> <span class="ow">in</span> <span class="n">dev_test_set_pre</span><span class="p">:</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dict_item</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="n">guess</span> <span class="o">=</span> <span class="n">NBayesClassifier</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">extract_features</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">guess</span> <span class="o">!=</span> <span class="n">value</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">guess</span><span class="p">,</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="p">)</span>
+</code></pre></div></div>
+
+<p>^ Looking through the Development test set on which we performed the accuracy assesment, we generate a list of the tweets in which the wrong label was predicted. Each item in the developement set looks like this…</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'tweet_id': '2191372252', 'text': 'good morning world ', 'label': 'positive'}
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">errors</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>('negative', 'positive', '306 letters to be sent out!! better start writing now ')
+2531
+</code></pre></div></div>
+
+<p>After compiling that list of errors, we now can peek at the first one, this is saying <br />
+<code class="highlighter-rouge">Correct Label = Negative, Predicted Label = Positive, Tweet Text = ....</code> <br />
+We also see that it mispredicted ~2500 labels</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">guess</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">errors</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'correct={:&lt;8}, guess={:&gt;8s}, text={:&lt;30}'</span><span class="o">.</span><span class="nb">format</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">guess</span><span class="p">,</span> <span class="n">text</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>^ We can then print this list and inspect for patterns to help determine what additional pieces would allow the classifier to make the right decision, or alternatively which pieces are tricking the classifier into making the wrong decisions.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>correct=negative, guess=positive, text= Heroes is losing it's momentum ): come on writers pick it up!!!
+correct=negative, guess=positive, text= my housemaid.........oh I hate her :s  I guess she has alzheimers she didn't even know MY NAME
+correct=negative, guess=positive, text= not looking forward to my 10 hour shift tomorrow.
+correct=negative, guess=positive, text=#3 woke up and was having an accident - &amp;quot;It's pushing, it's pushing!&amp;quot; he was crying because he couldn't stop from wetting his pants.
+correct=negative, guess=positive, text=#Lahore @ EssexEating only been to Lahore.  http://tinyurl.com/dbdjvz
+correct=negative, guess=positive, text=#dreams Had to speak at night honoring michelle obama as fashion icon. Did so wearing her clothes. Got pee on them while changing.
+correct=negative, guess=positive, text=#i36 Hope I'm feeling better by thursday, will be seriously annoyed if I'm ill over LAN
+correct=negative, guess=positive, text=&amp;quot;April SNOW showers. kill may flowers&amp;quot;
+.
+.
+.
+.
+</code></pre></div></div>
+
+<h2 id="testing-classifier">Testing Classifier</h2>
 
 <p>Now we are creating a vector of predicted sentiments for each tweet in the test set.</p>
 
@@ -783,7 +880,8 @@ POSITIVE PERCENTAGE = 79.0%
 ">Previous</a>
     
     
-      <a href="#" class="pagination--pager disabled">Next</a>
+      <a href="/twitter-mobile/" class="pagination--pager" title="Twitter Mobile
+">Next</a>
     
   </nav>
 
@@ -797,6 +895,35 @@ POSITIVE PERCENTAGE = 79.0%
     <div class="page__related">
       <h4 class="page__related-title">You may also enjoy</h4>
       <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/twitter-mobile/" rel="permalink">Twitter Mobile
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  less than 1 minute read
+
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Data Science
+</p>
+  </article>
+</div>
+
         
           
 
