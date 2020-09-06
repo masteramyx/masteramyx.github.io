@@ -3,7 +3,7 @@ title: "Twitter Mobile"
 date: 2020-08-14
 tags-mobile: [Android]
 header:
-  image: "../assets/images/twitter/twitter-header.png"
+  image: "../assets/images/twitter_mobile/twitter-compose-header.png"
 excerpt: "Data Science"
 classes: wide
 ---
