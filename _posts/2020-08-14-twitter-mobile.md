@@ -16,9 +16,23 @@ Core idea is the same but I wanted a way to make more widely available as openin
 
 # App Architecture
 
-There are multiple design paradigm's typically employed in an Android application. Model-View-ViewModel is a very popular one. The 3 main players here are obvious but let's talk a little about their interactions with one another. MVVM 
+There are multiple design paradigm's typically employed in an Android application. Model-View-ViewModel is a very popular one. The 3 main players here are obvious but let's talk a little about their interactions with one another. MVVM does a great job, in my opinion, of abstracting the <em>View's</em> behavior.
+
+
 MVVM \n
 ![](/assets/images/twitter_mobile/mvvm.png)
+
+
+ The <em>ViewModel</em> may provide a stream of events to which the <em>View</em> may subscribe to and take some action. It retrieves data from the <em>Model</em> layer, applies logic and exposes what it needs for the View. These exposures are happening via `Channels`, essentially `Observables` for Kotlin Corroutines.
+
+
+
+The <em>Model</em> is there to easily expose consumable data, either retrieved from some local data source(Room DB, Jetpack DataStore, Shared Preferences, etc..) or from a remote web service.
+
+
+ The <em>View</em> may notify the viewmodel of some actions the user takes, this is 2 way data binding between view and viewmodel and results in the view keeping a reference to the viewmodel but the viewmodel having no information of the view. The viewmodel is the producer of data here and the view the consumer, consumer needs to know where the data is coming from but the producer does not care about who consumes the data down the line. \n
+
+ This is the actual interface of the app. Typically, A Fragment, Activity, or any other custom android `View`. Normally we have to take care to bind/unbind from the event streams in the appropriate lifecycle events, but as you'll see later on. Kotlin Corroutines and Lifecycle aware components will take care of that for us.
 
 
 
