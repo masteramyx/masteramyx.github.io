@@ -16,7 +16,8 @@ Core idea is the same but I wanted a way to make more widely available as openin
 
 # App Architecture
 
-MVVM
+There are multiple design paradigm's typically employed in an Android application. Model-View-ViewModel is a very popular one. The 3 main players here are obvious but let's talk a little about their interactions with one another. MVVM 
+MVVM \n
 ![](/assets/images/twitter_mobile/mvvm.png)
 
 
@@ -91,6 +92,8 @@ This is all wrapped up into our Theme. Defined at the highest level of our UI hi
 
 
 
+
+# Fetching Tweets
 
 
 
