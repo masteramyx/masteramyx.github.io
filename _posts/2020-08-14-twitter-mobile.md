@@ -16,6 +16,11 @@ Core idea is the same but I wanted a way to make more widely available as openin
 
 # App Architecture
 
+MVVM
+![](/assets/images/twitter_mobile/mvvm.png)
+
+
+
 
 # Jetpack Compose
 
