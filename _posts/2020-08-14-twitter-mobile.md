@@ -19,7 +19,7 @@ Core idea is the same but I wanted a way to make more widely available as openin
 There are multiple design paradigm's typically employed in an Android application. Model-View-ViewModel is a very popular one. The 3 main players here are obvious but let's talk a little about their interactions with one another. MVVM does a great job, in my opinion, of abstracting the <em>View's</em> behavior.
 
 
-MVVM \n
+MVVM
 ![](/assets/images/twitter_mobile/mvvm.png)
 
 
@@ -107,7 +107,38 @@ This is all wrapped up into our Theme. Defined at the highest level of our UI hi
 
 
 
+# Building Views
+
+
+
+
+
+
+
+
 # Fetching Tweets
+
+The main Twitter API method used in this app is `/search`. For now, all we are interested in is searching a keyword and receiving a certain number of tweets that have been designated to have our search term as the core topic.
+ [Standard Search API](https://developer.twitter.com/en/docs/twitter-api/v1/tweets/search/api-reference/get-search-tweets)
+
+ The challenge here was that before now, I have only used RxJava for my asynchronous streams. I decided to give Kotlin Corroutines a try. Since I'm already using `Android ViewModel`, an android Architecture component, which provides 1st class support for corroutines due to the built in Coroutine scopes, I figured it shouldn't be too much work. The biggest hurdle was just understanding the differences (conceptual and syntatic) between RxJava world and Corroutine world.
+
+ Let's take for example Authentication.
+
+![](/assets/images/twitter_mobile/getToken.png)
+
+ All Coroutines are started from a `CoroutineScope`, which depend on our life-cycle aware component scope.`launch{}` is just an extension function of the `ViewModelScope` because it implements interface `CoroutineScope`. By default, we code inside the `launch{}` block is run off the main thread(Dispatchers.Main), this allows a simple, straight forward way to run non-blocking code.
+
+ 3 Dispatchers: Tells coroutine which type of threads to use for execution of corrotine block.
+
+1.a
+2.b
+3.c
+
+
+In our viewmodel's search function. We are preforming an asynchronous call to the network. These calls typically take less than a second but in the case of a slow network response, we are not blocking the UI, allowing the user to make any desired navigation.
+
+![](/assets/images/twitter_mobile/search.png)
 
 
 
