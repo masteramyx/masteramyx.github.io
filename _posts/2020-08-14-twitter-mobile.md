@@ -109,6 +109,27 @@ This is all wrapped up into our Theme. Defined at the highest level of our UI hi
 
 # Building Views
 
+Now that we've got the MaterialTheme set, let's talk about how the app will flow. Simple and easy to use, that's my main focus. I've decided the entire app will consist of 2 screens.
+
+1. Search Screen
+2. History Screen
+
+
+The app is hosted by a single Activity[NavActivity.kt], which hosts a NavigationDrawer in which we will link to our 2 screens(Fragments).
+
+![](/assets/images/twitter_mobile/nav_drawer.png)
+
+
+
+## Search Screen (ListFragment.kt)
+
+Let's take a look at how we want to establish the view component hierarchy on this page.
+
+
+
+
+
+
 
 
 
@@ -131,9 +152,14 @@ The main Twitter API method used in this app is `/search`. For now, all we are i
 
  3 Dispatchers: Tells coroutine which type of threads to use for execution of corrotine block.
 
-1.a
-2.b
-3.c
+1. Dispatchers.Main
+   -  Handle operations needing to run on the main thread, mainly UI. If these types of operations are NOT run on Dispatchers.Main, we crash.
+
+2. Dispatchers.IO
+   - Handle input/output, network operations. API Calls, reading/writing to disk and any DB communications
+
+3. Dispatchers.Default
+   - Called when no dispatcher is specified, typically used in CPU intense cases such as sorting list, parsing json and other similar tasks.
 
 
 In our viewmodel's search function. We are preforming an asynchronous call to the network. These calls typically take less than a second but in the case of a slow network response, we are not blocking the UI, allowing the user to make any desired navigation.
