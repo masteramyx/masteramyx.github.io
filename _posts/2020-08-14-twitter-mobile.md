@@ -21,7 +21,6 @@ There are multiple design paradigm's typically employed in an Android applicatio
 
 MVVM
 
-
 ![](/assets/images/twitter_mobile/mvvm.png)
 
 
@@ -119,7 +118,11 @@ Now that we've got the MaterialTheme set, let's talk about how the app will flow
 
 The app is hosted by a single Activity[NavActivity.kt], which hosts a NavigationDrawer in which we will link to our 2 screens(Fragments).
 
-<img src="/assets/images/twitter_mobile/nav_drawer.png" width=400 height=400 />
+<figure class="half">
+    <a href="/assets/images/twitter_mobile/empty_state.png"><img src="/assets/images/twitter_mobile/empty_state.png" width="45%"></a>
+    <a href="/assets/images/twitter_mobile/nav_drawer.png"><img src="/assets/images/twitter_mobile/nav_drawer.png" width="45%"></a>
+    <figcaption>Empty State and Nav Drawer</figcaption>
+</figure>
 
 
 
@@ -175,5 +178,174 @@ In our viewmodel's search function. We are preforming an asynchronous call to th
 
 # Storing results with Jetpack DataStore
 
+Jetpack DataStore allows storage of key-value pairs, it uses Kotlin coroutines and Flow for asynchronous data storage. This should be considered as a replace to SharedPreferences.
+
+2 implementations are provided:
+
+* Preferences DataStore: Key-value pairs
+* Proto DataStore: custom data types, requires a defined schema using protocol buffers
+
+Start with declaring the dependencies, since we are not storing typed ojects, we don't need the Protocol buffers dependency
+
+```groovy
+dependencies {
+  // Preferences DataStore
+  implementation "androidx.datastore:datastore-preferences:1.0.0-alpha01"
+}
+```
+
+I'm running into an issue of saving to disk and reading from disk across my 2 fragments. So I'll document my debugging process here. First step I'd take is to successfully read and write in the simplest case. I will keep a counter of how many times the list fragment has been instantiated and persist that number to disk.
+
+
+Upon launching app and creating the `List Fragment`, we call the viewModel function.
+
+ViewModel Layer
+```kotlin
+fun launchCounter() {
+    lifecycleScope.launch {
+        repository.incrementCounter()
+    }
+}
+```
+
+
+This calls to the repository which writes the data to disk.
+
+Repository Layer
+```kotlin
+override suspend fun incrementCounter() {
+    val dataStore: DataStore<Preferences> =
+        GlobalContext.get().koin.get(qualifier = named("counter"))
+    val EXAMPLE_COUNTER = preferencesKey<Int>("example_counter")
+    dataStore.edit { settings ->
+        val counterValue = settings[EXAMPLE_COUNTER] ?: 0
+        settings[EXAMPLE_COUNTER] = counterValue + 1
+        Timber.d("SAVED!%s", counterValue)
+    }
+}
+```
+
+After launching the app multiple times and logging the value, it is indeed working. Let's try to again apply this to saving a tweet from the list fragment and reading from the history fragment, which is where the tweets saved to disk should ultimately be displayed.
+
+Since I'm retreiving the DataStore via dependency injection and now I'll have 2 instances(1 for counter, 1 for tweets), I need to add named qualifiers for these in my Koin module.
+
+
+```groovy
+single<DataStore<Preferences>>(
+    qualifier = named(name = "counter")
+) {
+    androidContext().createDataStore(
+        name = "settings"
+    )
+}
+
+single<DataStore<Preferences>>(
+    qualifier = named(name = "tweets")
+) {
+    androidContext().createDataStore(
+        name = "tweets"
+    )
+}
+```
+
+Now when we make our call to the search request and have a list of tweets, for now just clicking the tweet will save the contents to our DataStore Preferences declared in the DI module
+
+<img src="/assets/images/twitter_mobile/list_item_click.png" width=400 height=400/>
+
+Making the call to the view model from the list item click listener
+
+```kotlin
+@Composable
+fun ListItem(item: TwitListItem, viewModel: TwitMainViewModel) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = {
+                viewModel.saveTweetToDisk(item)
+            })
+    ) {
+        Text(text = item.text)
+    }
+}
+```
+
+In the ViewModel
+
+```kotlin
+fun saveTweetToDisk(tweet: TwitListItem) {
+    lifecycleScope.launch(Dispatchers.IO) {
+        repository.saveTweetToDisk(tweet = tweet.text)
+    }
+}
+```
+
+and in the repository layer
+```kotlin
+override suspend fun saveTweetToDisk(tweet: String) {
+    val TWEET_KEY = preferencesKey<String>("tweet_key")
+    dataStore.edit { tweetPreferences ->
+        tweetPreferences[TWEET_KEY] = tweet
+        Timber.d("SAVED!%s", tweet)
+    }
+}
+```
+
+* Remember that `suspend` functions require a calling context, this means that you can only call suspend functions inside of another suspend function. Same with `@Composable` functions, this is new to me and has cause quite a bit of issues getting this app due to typical paradigms no longer being applicable.
+
+
+As for fetching the tweet we persisted to disk...
+
+<img src="/assets/images/twitter_mobile/datastore_hist.png" width=400 height=400/>
+
+
+We make the call to the HistoryViewModel as soon as we start to construct the views.
+
+ViewModel Layer
+```kotlin
+fun readTweetFromDisk() {
+    lifecycleScope.launch {
+        repository.readTweetFromDisk()
+            .flowOn(Dispatchers.IO)
+            .collect {
+                stateSubject.onNext(
+                    State.Data(listOf(it))
+                )
+            }
+    }
+}
+```
+
+
+Repository Layer
+```kotlin
+override suspend fun readTweetFromDisk(): Flow<String> {
+    val TWEET_KEY = preferencesKey<String>("tweet_key")
+    Timber.d("Is it here?: %s", dataStore.data.first().contains(TWEET_KEY))
+    return dataStore.data.map {
+        it[TWEET_KEY] ?: ""
+    }
+}
+```
+
+Notice that the function declaration does not contain `suspend`. This is because the lifecycleScope of the viewmodel is suspending.
+
+We subscribe to the `Flow<T>` being return from the repository and declare the thread we want the subscription on, next we `collect` the value and pass it through the state back to the view. and wah lah!
+
+**Important Note**:
+
+Normally you wouldn't use a key/value store in this manner. SharedPreferences/DataStore makes storing and reading small amounts of data fast and easy but difficult to store and read large structured data. Since this write-up is taking on new/experimental libraries, I didn't want to divert on this part either.
+
+Typically I would use a library backed by SQL, like `Room`. This makes large amounts of structured data easy to read/write, as the data is structured and managed by the database. This would allow potentially a huge list of tweets to be displayed and saved on the History screen. One would likely create a custom object such as
+
+```kotlin
+data class TweetDiskObject(
+  val tweet: String,
+  val date: String
+  )
+```
+
+Allowing for more complicated data objects to be persisted and retrieved, creating more opportunities to manipulate and display what the user wanted saved.
 
 # Using Tensorflow Lite pre-trained model
+
+Now to get back to the original inspiration for this quick project(quick for most, not me).
