@@ -294,6 +294,7 @@ override suspend fun saveTweetToDisk(tweet: String) {
 
 
 As for fetching the tweet we persisted to disk...
+
 <img src="/assets/images/twitter_mobile/datastore_hist.png" width=400 height=400/>
 
 
