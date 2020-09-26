@@ -119,11 +119,10 @@ Now that we've got the MaterialTheme set, let's talk about how the app will flow
 The app is hosted by a single Activity[NavActivity.kt], which hosts a NavigationDrawer in which we will link to our 2 screens(Fragments).
 
 <figure class="half">
-    <a href="/assets/images/twitter_mobile/nav_drawer.png"><img src="/assets/images/twitter_mobile/nav_drawer.png" width="45%"></a>
     <a href="/assets/images/twitter_mobile/empty_state.png"><img src="/assets/images/twitter_mobile/empty_state.png" width="45%"></a>
+    <a href="/assets/images/twitter_mobile/nav_drawer.png"><img src="/assets/images/twitter_mobile/nav_drawer.png" width="45%"></a>
     <figcaption>Empty State and Nav Drawer</figcaption>
 </figure>
-<img src="/assets/images/twitter_mobile/nav_drawer.png" width=400 height=400 />
 
 
 
@@ -211,6 +210,24 @@ After launching the app multiple times and logging the value, it is indeed worki
 
 Since I'm retreiving the DataStore via dependency injection and now I'll have 2 instances(1 for counter, 1 for tweets), I need to add named qualifiers for these in my Koin module.
 
+
+```groovy
+single<DataStore<Preferences>>(
+    qualifier = named(name = "counter")
+) {
+    androidContext().createDataStore(
+        name = "settings"
+    )
+}
+
+single<DataStore<Preferences>>(
+    qualifier = named(name = "tweets")
+) {
+    androidContext().createDataStore(
+        name = "tweets"
+    )
+}
+```
 pic
 
 
