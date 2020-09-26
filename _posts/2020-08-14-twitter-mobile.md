@@ -20,6 +20,8 @@ There are multiple design paradigm's typically employed in an Android applicatio
 
 
 MVVM
+
+
 ![](/assets/images/twitter_mobile/mvvm.png)
 
 
@@ -117,7 +119,9 @@ Now that we've got the MaterialTheme set, let's talk about how the app will flow
 
 The app is hosted by a single Activity[NavActivity.kt], which hosts a NavigationDrawer in which we will link to our 2 screens(Fragments).
 
-![](/assets/images/twitter_mobile/nav_drawer.png)
+<img src="/assets/images/twitter_mobile/nav_drawer.png" width=400 height=400 />
+
+
 
 
 
