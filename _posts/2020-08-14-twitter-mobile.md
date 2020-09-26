@@ -199,12 +199,31 @@ I'm running into an issue of saving to disk and reading from disk across my 2 fr
 
 Upon launching app and creating the `List Fragment`, we call the viewModel function.
 
-pic
+ViewModel Layer
+```kotlin
+fun launchCounter() {
+    lifecycleScope.launch {
+        repository.incrementCounter()
+    }
+}
+```
 
 
 This calls to the repository which writes the data to disk.
 
-pic
+Repository Layer
+```kotlin
+override suspend fun incrementCounter() {
+    val dataStore: DataStore<Preferences> =
+        GlobalContext.get().koin.get(qualifier = named("counter"))
+    val EXAMPLE_COUNTER = preferencesKey<Int>("example_counter")
+    dataStore.edit { settings ->
+        val counterValue = settings[EXAMPLE_COUNTER] ?: 0
+        settings[EXAMPLE_COUNTER] = counterValue + 1
+        Timber.d("SAVED!%s", counterValue)
+    }
+}
+```
 
 After launching the app multiple times and logging the value, it is indeed working. Let's try to again apply this to saving a tweet from the list fragment and reading from the history fragment, which is where the tweets saved to disk should ultimately be displayed.
 
@@ -228,9 +247,107 @@ single<DataStore<Preferences>>(
     )
 }
 ```
-pic
+
+Now when we make our call to the search request and have a list of tweets, for now just clicking the tweet will save the contents to our DataStore Preferences declared in the DI module
+
+![](/assets/images/twitter_mobile/list_item_click.png)
+
+Making the call to the view model from the list item click listener
+
+```kotlin
+@Composable
+fun ListItem(item: TwitListItem, viewModel: TwitMainViewModel) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = {
+                viewModel.saveTweetToDisk(item)
+            })
+    ) {
+        Text(text = item.text)
+    }
+}
+```
+
+In the ViewModel
+
+```kotlin
+fun saveTweetToDisk(tweet: TwitListItem) {
+    lifecycleScope.launch {
+        withContext(Dispatchers.IO) {
+            repository.saveTweetToDisk(tweet = tweet.text)
+        }
+    }
+}
+```
+
+and in the repository layer
+```kotlin
+override suspend fun saveTweetToDisk(tweet: String) {
+    val TWEET_KEY = preferencesKey<String>("tweet_key")
+    dataStore.edit { tweetPreferences ->
+        tweetPreferences[TWEET_KEY] = tweet
+        Timber.d("SAVED!%s", tweet)
+    }
+}
+```
+
+* Remember that `suspend` functions require a calling context, this means that you can only call suspend functions inside of another suspend function. Same with `@Composable` functions, this is new to me and has cause quite a bit of issues getting this app due to typical paradigms no longer being applicable.
 
 
+As for fetching the tweet we persisted to disk...
 
+![](/assets/images/twitter_mobile/datastore_hist.png)
+
+
+We make the call to the HistoryViewModel as soon as we start to construct the views.
+
+ViewModel Layer
+```kotlin
+fun readTweetFromDisk() {
+    lifecycleScope.launch {
+        repository.readTweetFromDisk()
+            .flowOn(Dispatchers.IO)
+            .collect {
+                stateSubject.onNext(
+                    State.Data(listOf(it))
+                )
+            }
+    }
+}
+```
+
+
+Repository Layer
+```kotlin
+override suspend fun readTweetFromDisk(): Flow<String> {
+    val TWEET_KEY = preferencesKey<String>("tweet_key")
+    Timber.d("Is it here?: %s", dataStore.data.first().contains(TWEET_KEY))
+    return dataStore.data.map {
+        it[TWEET_KEY] ?: ""
+    }
+}
+```
+
+Notice that the function declaration does not contain `suspend`. This is because the lifecycleScope of the viewmodel is suspending.
+
+We subscribe to the `Flow<T>` being return from the repository and declare the thread we want the subscription on, next we `collect` the value and pass it through the state back to the view. and wah lah!
+
+**Important Note**:
+
+Normally you wouldn't use a key/value store in this manner. SharedPreferences/DataStore makes storing and reading small amounts of data fast and easy but difficult to store and read large structured data. Since this write-up is taking on new/experimental libraries, I didn't want to divert on this part either.
+
+Typically I would use a library backed by SQL, like `Room`. This makes large amounts of structured data easy to read/write, as the data is structured and managed by the database. This would allow potentially a huge list of tweets to be displayed and saved on the History screen. One would likely create a custom object such as
+
+```kotlin
+data class TweetDiskObject(
+  val tweet: String,
+  val date: String
+  )
+```
+
+Allowing for more complicated data objects to be persisted and retrieved, creating more opportunities to manipulate and display what the user wanted saved.
 
 # Using Tensorflow Lite pre-trained model
+
+Now to get back to the original inspiration for this quick project(quick for most, not me).
