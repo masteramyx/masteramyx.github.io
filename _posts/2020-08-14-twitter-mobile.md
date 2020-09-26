@@ -250,7 +250,7 @@ single<DataStore<Preferences>>(
 
 Now when we make our call to the search request and have a list of tweets, for now just clicking the tweet will save the contents to our DataStore Preferences declared in the DI module
 
-![](/assets/images/twitter_mobile/list_item_click.png)
+<img src="/assets/images/twitter_mobile/list_item_click.png" width=400, height=400>
 
 Making the call to the view model from the list item click listener
 
@@ -296,8 +296,7 @@ override suspend fun saveTweetToDisk(tweet: String) {
 
 
 As for fetching the tweet we persisted to disk...
-
-![](/assets/images/twitter_mobile/datastore_hist.png)
+<img src="/assets/images/twitter_mobile/datastore_hist.png" width=400, height=400>
 
 
 We make the call to the HistoryViewModel as soon as we start to construct the views.
