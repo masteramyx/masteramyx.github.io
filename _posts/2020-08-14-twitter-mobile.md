@@ -250,7 +250,7 @@ single<DataStore<Preferences>>(
 
 Now when we make our call to the search request and have a list of tweets, for now just clicking the tweet will save the contents to our DataStore Preferences declared in the DI module
 
-<img src="/assets/images/twitter_mobile/list_item_click.png" width=400, height=400>
+<img src="/assets/images/twitter_mobile/list_item_click.png" width=400 height=400/>
 
 Making the call to the view model from the list item click listener
 
@@ -273,10 +273,8 @@ In the ViewModel
 
 ```kotlin
 fun saveTweetToDisk(tweet: TwitListItem) {
-    lifecycleScope.launch {
-        withContext(Dispatchers.IO) {
-            repository.saveTweetToDisk(tweet = tweet.text)
-        }
+    lifecycleScope.launch(Dispatchers.IO) {
+        repository.saveTweetToDisk(tweet = tweet.text)
     }
 }
 ```
@@ -296,7 +294,7 @@ override suspend fun saveTweetToDisk(tweet: String) {
 
 
 As for fetching the tweet we persisted to disk...
-<img src="/assets/images/twitter_mobile/datastore_hist.png" width=400, height=400>
+<img src="/assets/images/twitter_mobile/datastore_hist.png" width=400 height=400/>
 
 
 We make the call to the HistoryViewModel as soon as we start to construct the views.
