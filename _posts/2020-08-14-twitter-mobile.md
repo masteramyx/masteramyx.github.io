@@ -21,7 +21,7 @@ There are multiple design paradigm's typically employed in an Android applicatio
 
 MVVM
 
-![](/assets/images/twitter_mobile/mvvm.png)
+![](/assets/images/twitter_mobile/MVVM.png)
 
 
  The <em>ViewModel</em> may provide a stream of events to which the <em>View</em> may subscribe to and take some action. It retrieves data from the <em>Model</em> layer, applies logic and exposes what it needs for the View. These exposures are happening via `Channels`, essentially `Observables` for Kotlin Corroutines.
@@ -349,3 +349,11 @@ Allowing for more complicated data objects to be persisted and retrieved, creati
 # Using Tensorflow Lite pre-trained model
 
 Now to get back to the original inspiration for this quick project(quick for most, not me).
+
+
+
+
+
+
+
+# Testing with Compose
