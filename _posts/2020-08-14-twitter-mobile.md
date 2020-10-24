@@ -35,7 +35,9 @@ The <em>Model</em> is there to easily expose consumable data, either retrieved f
 
  This is the actual interface of the app. Typically, A Fragment, Activity, or any other custom android `View`. Normally we have to take care to bind/unbind from the event streams in the appropriate lifecycle events, but as you'll see later on. Kotlin Corroutines and Lifecycle aware components will take care of that for us.
 
+## Application Flow
 
+![](/assets/images/twitter_mobile/twittude_flow.png)
 
 
 # Jetpack Compose
@@ -108,6 +110,8 @@ This is all wrapped up into our Theme. Defined at the highest level of our UI hi
 
 
 
+
+
 # Building Views
 
 Now that we've got the MaterialTheme set, let's talk about how the app will flow. Simple and easy to use, that's my main focus. I've decided the entire app will consist of 2 screens.
@@ -137,8 +141,9 @@ Let's take a look at how we want to establish the view component hierarchy on th
 
 
 
+## History Screen (HistoryFragment.kt)
 
-
+Let's take a look at how we want to establish the view component hierarchy on this page.
 
 
 
@@ -146,9 +151,71 @@ Let's take a look at how we want to establish the view component hierarchy on th
 
 # Fetching Tweets
 
+
+## Modeling out the API call
+
+At first I was using the library `Twitter4J` to expedite making the API calls, so I could see some demonstratable results, I've since decided to model out the search response myself. Mainly to make testing my ViewModel/Repository logic more straight forward.
+
+At the moment, this application will only make use of 2 API requests. One to authenticate and gain access to the twitter api and the other to make search requests which return the tweets we will pass through our model for sentiment analysis.
+
+### Authentication with Twitter API
+
+The most important thing to point out here is that we are preforming what is called `Application-Only Authentication`, typically with OAuth1.0 we would be making requests on behalf of a user and need to sign each API request with serveral generated keys and tokens in an authorized header. This signature being passed to each request would represent that specific user.
+
+With `Application-Only Authentication` and OAuth2.0 Bearer Token, which is used here, we are able to create a signature for the application itself. Typically used for instances that need read-only access to public information. This obviously limits the functionality of some endpoints for us since there is no concept of a "current user", for example, a twitter user will not be able to use this application to take actions pertaining to their twitter account such as posting tweets or making profile changes.
+
+Before being able to authenticate, there are a few prerequisites which can only be achieved by creating a developer account with twitter and receiving these items
+* CONSUMER_KEY
+* CONSUMER_SECRET
+* ACCESS_KEY
+* ACCESS_SECRET
+
+
+
+![](/assets/images/twitter_mobile/OAuth2.png)
+
+
+The graph above describes the entire application network flow. Focusing on the Top part, there are a few steps required in order to properly format our request and receive the bearer token.
+
+1.) URL Encode(RFC 1739) both the CONSUMER_KEY and CONSUMER_SECRET
+2.) Create a new string in format of "CONSUMER_KEY:CONSUMER_SECRET", using the encoded versions created above.
+3.) Base64 encoded the string created in the step above.
+
+We can now make the post request to the resource url `https://api.twitter.com/oauth2/token`, there are some required headers and query params. The request should look something like this
+
+```
+POST oaut2/token
+Authorization: Basic <Base64 encoded concatenated string from above>
+Content-Type: application/x-www-form-urlencoded;chartset=UTF-8
+grant_type=client_credentials
+```
+
+If everything was properly formatted then we received the bearer token in a json response.
+
+```json
+{
+  "token_type": "bearer",
+  "access_token": "AAAABBBBCCCCDDDEEEFFF%AAAABBBBCCCCDDDEEEFFF"
+}
+```
+
+That's it. Something to remember here is to cache this bearer token, making this request over and over will return the same bearer token until it is invalidated, which would usually be done in the case of it being compromised. Making the request for the bearer token can be expensive and use up our precious rate limits, we should not make network requests against the api unless necessary. I've chosen to store this token using `DataStore` which is on the device. Although there are many options to choose from.
+
+
+### Making a twitter Search API request.
+
+Now that we've authenticated our app and cached our token, we are able to make requests against all the available API endpoints.
+
 The main Twitter API method used in this app is `/search`. For now, all we are interested in is searching a keyword and receiving a certain number of tweets that have been designated to have our search term as the core topic.
  [Standard Search API](https://developer.twitter.com/en/docs/twitter-api/v1/tweets/search/api-reference/get-search-tweets)
 
+ 
+
+
+
+
+
+## Calling the API in code
  The challenge here was that before now, I have only used RxJava for my asynchronous streams. I decided to give Kotlin Corroutines a try. Since I'm already using `Android ViewModel`, an android Architecture component, which provides 1st class support for corroutines due to the built in Coroutine scopes, I figured it shouldn't be too much work. The biggest hurdle was just understanding the differences (conceptual and syntatic) between RxJava world and Corroutine world.
 
  Let's take for example Authentication.
@@ -358,7 +425,15 @@ WIP!!!
 
 
 
-# Testing with Compose
+# UI and Unit Testing with Compose
 
 
-WIP!!!
+A big difference with compose is that, since we are now just invoking functions, we do not have a reference to our widgets and there is no concept of `ID`, therefore we can not perform something like `findViewById<TextView>(R.id.some_view)`.
+
+Jetpack compose introduces `Semantics, providing information about the view hierarchy. It gives meaning to a piece of UI. Tests take advantage of the information exposed by semantics regarding the UI hierarchy.
+
+
+
+
+
+With Unit Testing, nothing as changed. Since we are concerned with the data and ensuring our functions do what they are supposed to.
