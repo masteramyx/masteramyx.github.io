@@ -134,9 +134,9 @@ The app is hosted by a single Activity[NavActivity.kt], which hosts a Navigation
 
 ## Search Screen (ListFragment.kt)
 
-Let's take a look at how we want to establish the view component hierarchy on this page.
+Let's take a look at how we want to establish the view component hierarchy on this page.  
 
-
+![](/assets/images/twitter_mobile/ListHierarchy.png)
 
 
 
@@ -204,25 +204,37 @@ That's it. Something to remember here is to cache this bearer token, making this
 
 ### Making a twitter Search API request.
 
-Now that we've authenticated our app and cached our token, we are able to make requests against all the available API endpoints.
+Now that we've authenticated our app and cached our token, we are able to make requests against all the available API endpoints. This is the bottom half of the graph shown above, top half was authentication and bottom is using that token to validate our requests.
 
 The main Twitter API method used in this app is `/search`. For now, all we are interested in is searching a keyword and receiving a certain number of tweets that have been designated to have our search term as the core topic.
- [Standard Search API](https://developer.twitter.com/en/docs/twitter-api/v1/tweets/search/api-reference/get-search-tweets)
-
- 
+ ~~[Standard Search API](https://developer.twitter.com/en/docs/twitter-api/v1/tweets/search/api-reference/get-search-tweets)~~
 
 
+ As of this writing, I updated my developer account to use the early access V2 Api's. These are supposed to be much more developer friendly and from viewing the JSON responses, I would agree that they are.
+ [V2 Search API](https://developer.twitter.com/en/docs/twitter-api/tweets/search/migrate/standard-to-twitter-api-v2)
 
+
+The only required parameter is obviously, the query itself. This is an example of a potential search request
+
+```
+GET /2/tweets/search/recent
+Authorization: Bearer <Bearer Token here>
+
+query="atlanta falcons"
+lang="en"
+max_results="100"
+```
+
+This request will return 100 tweets around the Atlanta Falcons in english only.
+
+And that's it. Pretty simple. Now time to write to code for making these network requests.
 
 
 ## Calling the API in code
- The challenge here was that before now, I have only used RxJava for my asynchronous streams. I decided to give Kotlin Corroutines a try. Since I'm already using `Android ViewModel`, an android Architecture component, which provides 1st class support for corroutines due to the built in Coroutine scopes, I figured it shouldn't be too much work. The biggest hurdle was just understanding the differences (conceptual and syntatic) between RxJava world and Corroutine world.
+ The challenge here was that before now, I have only used RxJava for my asynchronous streams. I decided to give Kotlin Corroutines a try. Since I'm already using `Android ViewModel`, an android Architecture component, which provides 1st class support for corroutines due to the built in Coroutine scopes, I figured it would be a good time to get my hands dirty. The biggest hurdle was just understanding the differences (conceptual and syntatic) between RxJava world and Corroutine world.
 
- Let's take for example Authentication.
 
-![](/assets/images/twitter_mobile/getToken.png)
-
- All Coroutines are started from a `CoroutineScope`, which depend on our life-cycle aware component scope.`launch{}` is just an extension function of the `ViewModelScope` because it implements interface `CoroutineScope`. By default, we code inside the `launch{}` block is run off the main thread(Dispatchers.Main), this allows a simple, straight forward way to run non-blocking code.
+ All Coroutines are started from a `CoroutineScope`, which depend on our life-cycle aware component scope.`launch{}` is just an extension function of the `ViewModelScope` because it implements interface `CoroutineScope`. By default, the code inside the `launch{}` block is run off the main thread(Dispatchers.Main), this allows a simple, straight forward way to run non-blocking code.
 
  3 Dispatchers: Tells coroutine which type of threads to use for execution of corrotine block.
 
@@ -236,9 +248,25 @@ The main Twitter API method used in this app is `/search`. For now, all we are i
    - Called when no dispatcher is specified, typically used in CPU intense cases such as sorting list, parsing json and other similar tasks.
 
 
+
+
+### Authenticating in Code
+
+Let's take for example Authentication.
+
+![](/assets/images/twitter_mobile/get_token.png)
+
+
+
+
+### Searching in Code
 In our viewmodel's search function. We are preforming an asynchronous call to the network. These calls typically take less than a second but in the case of a slow network response, we are not blocking the UI, allowing the user to make any desired navigation.
 
 ![](/assets/images/twitter_mobile/search.png)
+
+
+That's enough about the ViewModel. The repository layer is where the network magic happens.
+
 
 
 
